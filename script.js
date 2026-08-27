@@ -1,10 +1,4 @@
 
-Conversa com o Gemini
-faça um jogo de zumbi 2d onde o plano de fundo seja predios e casas destruidas e pegando fogo algo bem apocaliptico com uma paleta de cores cinzentas onde o personagem principal ande para a direita matando zumbis de diferentes tamanhos e forma e diferente barras de vida, o personagem principal tem que conter duas armas iniciais uma sendo uma pistola e a outra arma sendo uma arma pesada mas que de muito danos aos zumbis e obstaculos e quando o personagem terminar o mapa ele passa de fase e cvai direto a uma fase onde ele tem que lutar contra um zumbi chefe forte imponete com design diferente e muita vida e com habilidades especiais
-
-Este é um protótipo completo de um jogo 2D em HTML5 e Canvas JavaScript. Ele possui cenários apocalípticos em tons de cinza, prédios em chamas no fundo, dois tipos de armas com alternância, zumbis variados com barras de vida, transição de fase e um chefão final com habilidades especiais.
-
-Para jogar, basta salvar o código abaixo como index.html e abri-lo em qualquer navegador de internet.
 
 HTML
 <!DOCTYPE html>
@@ -2386,4 +2380,4 @@ function gameLoop() {
 iniciarFase1();
 gameLoop();
 zombie_game/script.js
-Exibindo zombie_game/script.js.
+Exibindo zombie_game/script.js
