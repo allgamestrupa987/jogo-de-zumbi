@@ -1,24 +1,65 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apocalipse Zumbi</title>
+    <title>Apocalipse Zumbi: Sobrevivente</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="game-container">
-        <div id="hud">
-            <div>Vida: <span id="hp">100</span>%</div>
-            <div>Fase: <span id="level">1</span>/5</div>
-            <div>Arma: <span id="weapon-name">Pistola</span></div>
-            <div>Inimigos: <span id="enemy-count">0</span></div>
+        <!-- Fundo Pós-Apocalíptico -->
+        <div class="background" id="game-background">
+            <div class="destroyed-buildings"></div>
+            <div class="burning-houses"></div>
         </div>
-        <canvas id="gameCanvas" width="800" height="400"></canvas>
-        <div id="controls-info">
-            Controles: <b>A / D</b> (Mover) | <b>Q / 1 / 2</b> (Trocar Arma) | <b>Clique do Mouse</b> (Atirar)
+
+        <!-- HUD (Interface do Usuário) -->
+        <div id="hud">
+            <div id="health-bar-container">
+                <div id="health-bar"></div>
+            </div>
+            <div id="weapon-indicator">Arma: <span id="current-weapon">Pistola</span></div>
+            <div id="level-indicator">Fase: <span id="current-level">1/5</span></div>
+            <div id="score">Pontos: <span id="current-score">0</span></div>
+            <div id="ammo-indicator">Munição: <span id="current-ammo">12/30</span></div>
+            <!-- Botão de Pause (similar à imagem 0) -->
+            <button id="pause-btn">||</button>
+        </div>
+
+        <!-- Elementos do Jogo (serão inseridos via JavaScript) -->
+        <div id="game-canvas"></div>
+
+        <!-- Controles de Toque (para mobile, baseados nas imagens) -->
+        <div id="touch-controls">
+            <div id="joystick">
+                <div class="joystick-ring"></div>
+                <div id="joystick-knob"></div>
+            </div>
+            <button id="btn-fire"></button>
+            <button id="btn-reload">🔄</button>
+            <button id="btn-weapon-swap">🔫/🔫</button>
         </div>
     </div>
+
+    <!-- Modais de Estado -->
+    <div id="pause-modal" class="modal hidden">
+        <h2>Jogo Pausado</h2>
+        <button onclick="togglePause()">Continuar</button>
+    </div>
+
+    <div id="game-over-modal" class="modal hidden">
+        <h2>Fim de Jogo!</h2>
+        <p>Você sobreviveu até a Fase: <span id="final-level"></span></p>
+        <button onclick="restartGame()">Tentar Novamente</button>
+    </div>
+
+    <div id="win-modal" class="modal hidden">
+        <h2>Sobreviveu!</h2>
+        <p>Você derrotou o Grande Chefe e sobreviveu ao apocalipse.</p>
+        <button onclick="restartGame()">Jogar Novamente</button>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
