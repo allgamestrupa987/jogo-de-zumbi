@@ -3,59 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apocalipse Zumbi: Sobrevivente (PC)</title>
+    <title>Apocalipse Zumbi: Sobrevivente</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
+
     <div id="game-container">
-        <!-- Fundo Pós-Apocalíptico -->
+
+        <!-- FUNDO DO JOGO -->
         <div class="background" id="game-background">
-            <div class="destroyed-buildings"></div>
-            <div class="burning-houses"></div>
+            <div class="background-overlay"></div>
         </div>
 
-        <!-- HUD / Interface do Jogador -->
+        <!-- HUD -->
         <div id="hud">
-            <div class="hud-item">
+
+            <div class="hud-item health-item">
                 <span class="hud-label">VIDA:</span>
+
                 <div id="health-bar-container">
                     <div id="health-bar"></div>
                 </div>
             </div>
-            <div class="hud-item">ARMA: <span id="current-weapon">Pistola</span></div>
-            <div class="hud-item">FASE: <span id="current-level">1/5</span></div>
-            <div class="hud-item">PONTOS: <span id="current-score">0</span></div>
-            <div class="hud-item">MUNIÇÃO: <span id="current-ammo">12/30</span></div>
+
+            <div class="hud-item">
+                ARMA:
+                <span id="current-weapon">Pistola</span>
+            </div>
+
+            <div class="hud-item">
+                FASE:
+                <span id="current-level">1/5</span>
+            </div>
+
+            <div class="hud-item">
+                PONTOS:
+                <span id="current-score">0</span>
+            </div>
+
+            <div class="hud-item">
+                MUNIÇÃO:
+                <span id="current-ammo">12/60</span>
+            </div>
+
         </div>
 
-        <!-- Tela do Jogo -->
+        <!-- ÁREA DO JOGO -->
         <div id="game-canvas"></div>
 
-        <!-- Guia de Controles Rápido -->
+        <!-- CONTROLES -->
         <div id="controls-hint">
-            [WASD] Mover | [Mouse] Mirar/Atirar | [Q] Trocar Arma | [R] Recarregar | [P] Pausar
+            [WASD] Mover |
+            [Mouse] Mirar/Atirar |
+            [Q] Trocar Arma |
+            [R] Recarregar |
+            [P] Pausar
         </div>
+
     </div>
 
-    <!-- Modais de Estado -->
+    <!-- PAUSA -->
     <div id="pause-modal" class="modal hidden">
+
         <h2>JOGO PAUSADO</h2>
-        <p>Pressione [P] para continuar</p>
+
+        <p>
+            Pressione <strong>[P]</strong> para continuar
+        </p>
+
     </div>
 
+    <!-- GAME OVER -->
     <div id="game-over-modal" class="modal hidden">
+
         <h2>FIM DE JOGO!</h2>
-        <p>Você sobreviveu até a Fase: <span id="final-level"></span></p>
-        <button onclick="restartGame()">Tentar Novamente</button>
+
+        <p>
+            Você sobreviveu até a Fase:
+            <span id="final-level"></span>
+        </p>
+
+        <button onclick="restartGame()">
+            Tentar Novamente
+        </button>
+
     </div>
 
+    <!-- VITÓRIA -->
     <div id="win-modal" class="modal hidden">
+
         <h2>VITÓRIA!</h2>
-        <p>Você destruiu o Chefe Zumbi e sobreviveu ao apocalipse.</p>
-        <button onclick="restartGame()">Jogar Novamente</button>
+
+        <p>
+            Você destruiu o Chefe Zumbi
+            e sobreviveu ao apocalipse!
+        </p>
+
+        <button onclick="restartGame()">
+            Jogar Novamente
+        </button>
+
     </div>
 
     <script src="script.js"></script>
+
 </body>
 </html>
-

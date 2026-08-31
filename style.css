@@ -1,295 +1,724 @@
+/* ============================================================
+   CONFIGURAÇÃO GERAL
+   ============================================================ */
+
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
-body, html {
+
+html,
+body {
+
     width: 100%;
     height: 100%;
+
     overflow: hidden;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #fff;
+
+    font-family:
+        'Segoe UI',
+        Tahoma,
+        Geneva,
+        Verdana,
+        sans-serif;
+
+    color: white;
+
     user-select: none;
-    background-color: #000;
+
+    background: #000;
+
 }
+
+
+/* ============================================================
+   CONTAINER DO JOGO
+   ============================================================ */
 
 #game-container {
+
     width: 100vw;
     height: 100vh;
+
     position: relative;
+
     overflow: hidden;
-    cursor: crosshair; /* Mira do mouse */
+
+    cursor: crosshair;
+
 }
 
-/* --- Fundo Pós-Apocalíptico --- */
+
+/* ============================================================
+   FUNDO COM IMAGEM
+   ============================================================ */
+
 .background {
-    position: absolute;
-    width: 200%;
-    height: 100%;
-    background: linear-gradient(to bottom, #2b1f1d 0%, #111115 100%);
-    z-index: 1;
-}
 
-.destroyed-buildings {
     position: absolute;
-    width: 100%;
-    height: 65%;
-    bottom: 0;
-    background: 
-        repeating-linear-gradient(to right, #181818 0px, #181818 120px, transparent 120px, transparent 220px),
-        repeating-linear-gradient(to right, #0d0d0d 0px, #0d0d0d 80px, transparent 80px, transparent 150px);
-    opacity: 0.85;
-}
 
-.burning-houses {
-    position: absolute;
-    width: 100%;
-    height: 35%;
-    bottom: 0;
-    background: 
-        radial-gradient(circle at 15% 80%, rgba(255, 68, 0, 0.4) 0%, transparent 40%),
-        radial-gradient(circle at 50% 85%, rgba(255, 140, 0, 0.5) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(255, 68, 0, 0.4) 0%, transparent 40%),
-        repeating-linear-gradient(to right, #251105 0px, #251105 60px, transparent 60px, transparent 140px);
-    animation: fireGlow 1.5s infinite alternate ease-in-out;
-}
-
-@keyframes fireGlow {
-    0% { opacity: 0.7; }
-    100% { opacity: 1; }
-}
-
-/* --- HUD / Interface PC --- */
-#hud {
-    position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
-    padding: 15px 25px;
-    z-index: 100;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: rgba(0, 0, 0, 0.7);
-    border-bottom: 2px solid #444;
-    font-weight: bold;
-    letter-spacing: 1px;
+
+    width: 300%;
+    height: 100%;
+
+    z-index: 1;
+
+    background-image:
+        url("./images (5).jpg");
+
+    background-size: cover;
+
+    background-position:
+        center center;
+
+    background-repeat:
+        repeat-x;
+
+    will-change: transform;
+
 }
+
+
+/* Escurece o fundo */
+
+.background-overlay {
+
+    position: absolute;
+
+    inset: 0;
+
+    background:
+        linear-gradient(
+            rgba(0, 0, 0, 0.15),
+            rgba(0, 0, 0, 0.45)
+        );
+
+    pointer-events: none;
+
+}
+
+
+/* ============================================================
+   HUD
+   ============================================================ */
+
+#hud {
+
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+
+    min-height: 70px;
+
+    padding:
+        12px 22px;
+
+    z-index: 100;
+
+    display: flex;
+
+    justify-content:
+        space-between;
+
+    align-items:
+        center;
+
+    gap: 20px;
+
+    background:
+        rgba(0, 0, 0, 0.75);
+
+    border-bottom:
+        2px solid
+        rgba(255, 255, 255, 0.2);
+
+    font-weight: bold;
+
+    letter-spacing: 1px;
+
+    text-shadow:
+        2px 2px 3px black;
+
+}
+
 
 .hud-item {
+
     display: flex;
+
     align-items: center;
-    gap: 10px;
+
+    gap: 8px;
+
+    white-space: nowrap;
+
 }
+
 
 .hud-label {
-    color: #ff4444;
+
+    color:
+        #ff4444;
+
 }
+
+
+/* ============================================================
+   BARRA DE VIDA
+   ============================================================ */
 
 #health-bar-container {
-    width: 200px;
+
+    width: 180px;
+
     height: 20px;
-    background-color: #222;
-    border: 2px solid #888;
-    border-radius: 3px;
+
+    background:
+        #171717;
+
+    border:
+        2px solid
+        #888;
+
+    border-radius: 4px;
+
     overflow: hidden;
+
+    box-shadow:
+        inset 0 0 5px #000;
+
 }
+
 
 #health-bar {
+
     width: 100%;
+
     height: 100%;
-    background-color: #ff3333;
-    transition: width 0.1s linear;
+
+    background:
+        linear-gradient(
+            to bottom,
+            #ff5555,
+            #b80000
+        );
+
+    transition:
+        width 0.1s linear;
+
 }
 
-#controls-hint {
-    position: absolute;
-    bottom: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.6);
-    padding: 6px 16px;
-    border-radius: 20px;
-    font-size: 13px;
-    color: #aaa;
-    z-index: 100;
-    border: 1px solid #333;
-}
 
-/* --- Elementos do Jogo --- */
+/* ============================================================
+   ÁREA DO JOGO
+   ============================================================ */
+
 #game-canvas {
+
     position: absolute;
+
+    top: 0;
+    left: 0;
+
     width: 100%;
     height: 100%;
+
     z-index: 10;
+
 }
 
-/* Jogador (2 pernas, 2 braços, 1 cabeça) */
+
+/* ============================================================
+   JOGADOR
+   ============================================================ */
+
 .player {
+
     position: absolute;
-    width: 36px;
-    height: 64px;
-    z-index: 20;
+
+    width: 55px;
+    height: 80px;
+
+    z-index: 30;
+
+    pointer-events: none;
+
 }
 
-.player-head {
-    position: absolute;
-    top: 0;
-    left: 8px;
-    width: 20px;
-    height: 20px;
-    background-color: #ffcc99;
-    border-radius: 50%;
-    border: 2px solid #000;
-}
+
+/* Corpo simples */
 
 .player-body {
+
     position: absolute;
-    top: 20px;
-    left: 8px;
-    width: 20px;
-    height: 24px;
-    background-color: #2b5b84;
-    border: 2px solid #000;
+
+    left: 16px;
+    top: 25px;
+
+    width: 25px;
+    height: 38px;
+
+    background:
+        linear-gradient(
+            to right,
+            #1d3e5c,
+            #3479a8,
+            #1d3e5c
+        );
+
+    border:
+        2px solid #050505;
+
+    border-radius:
+        5px 5px 3px 3px;
+
+    box-shadow:
+        0 4px 5px
+        rgba(0,0,0,0.7);
+
 }
 
-.player-arm {
+
+/* Cabeça */
+
+.player-head {
+
     position: absolute;
-    top: 22px;
-    width: 6px;
-    height: 18px;
-    background-color: #ffcc99;
-    border: 1px solid #000;
+
+    left: 18px;
+    top: 5px;
+
+    width: 22px;
+    height: 22px;
+
+    background:
+        #d99b6b;
+
+    border:
+        2px solid #111;
+
+    border-radius: 50%;
+
+    z-index: 2;
+
 }
 
-.player-arm.left { left: 2px; }
-.player-arm.right { right: 2px; }
 
-.player-leg {
-    position: absolute;
-    bottom: 0;
-    width: 8px;
-    height: 20px;
-    background-color: #333;
-    border: 1px solid #000;
-}
+/* ============================================================
+   ARMAS
+   ============================================================ */
 
-.player-leg.left { left: 8px; }
-.player-leg.right { right: 20px; }
-
-/* Armas nas mãos */
 .weapon {
+
     position: absolute;
-    top: 26px;
-    left: 20px;
-    transform-origin: left center;
-    z-index: 21;
+
+    top: 31px;
+    left: 31px;
+
+    object-fit: contain;
+
+    object-position:
+        center;
+
+    transform-origin:
+        8px 50%;
+
+    z-index: 40;
+
+    pointer-events: none;
+
+    filter:
+        drop-shadow(
+            0 2px 3px
+            rgba(0,0,0,0.9)
+        );
+
 }
+
+
+/* Pistola */
 
 .pistol-held {
-    width: 18px;
-    height: 6px;
-    background-color: #888;
-    border: 1px solid #000;
+
+    width: 60px;
+    height: 35px;
+
 }
+
+
+/* AK47 */
 
 .ak47-held {
-    width: 34px;
-    height: 8px;
-    background-color: #8b5a2b;
-    border: 1px solid #000;
+
+    width: 100px;
+    height: 45px;
+
 }
 
-/* Inimigos */
+
+/* ============================================================
+   ZUMBIS
+   ============================================================ */
+
 .zombie {
+
     position: absolute;
-    width: 36px;
-    height: 64px;
-    background-color: #4d7c38;
-    border: 2px solid #1e3314;
-    border-radius: 4px;
-    z-index: 15;
+
+    width: 55px;
+    height: 75px;
+
+    object-fit: contain;
+
+    object-position:
+        center;
+
+    z-index: 20;
+
+    pointer-events: none;
+
+    filter:
+        drop-shadow(
+            0 4px 5px
+            rgba(0,0,0,0.85)
+        );
+
 }
 
-/* Chefe Zumbi */
+
+/* ============================================================
+   CHEFE
+   ============================================================ */
+
 .boss-zombie {
+
     position: absolute;
-    width: 90px;
-    height: 160px;
-    background-color: #5a2a7a;
-    border: 4px solid #8a3ab9;
-    border-radius: 8px;
-    box-shadow: 0 0 20px rgba(138, 58, 185, 0.6);
-    z-index: 16;
+
+    width: 130px;
+    height: 200px;
+
+    object-fit: contain;
+
+    object-position:
+        center;
+
+    z-index: 25;
+
+    pointer-events: none;
+
+    filter:
+        drop-shadow(
+            0 0 15px
+            rgba(255, 0, 0, 0.65)
+        )
+        drop-shadow(
+            0 8px 8px
+            rgba(0,0,0,0.9)
+        );
+
 }
 
-/* Projéteis */
+
+/* ============================================================
+   BALAS
+   ============================================================ */
+
 .bullet {
+
     position: absolute;
-    width: 8px;
-    height: 4px;
-    background-color: #ffea00;
-    border-radius: 2px;
-    box-shadow: 0 0 4px #ffea00;
-    z-index: 25;
+
+    width: 10px;
+    height: 5px;
+
+    background:
+        linear-gradient(
+            to right,
+            #fff,
+            #ffe600,
+            #ff6600
+        );
+
+    border-radius: 5px;
+
+    box-shadow:
+        0 0 7px
+        #ffe600;
+
+    z-index: 50;
+
+    pointer-events: none;
+
 }
+
+
+/* ============================================================
+   PEDRA DO CHEFE
+   ============================================================ */
 
 .rock-projectile {
+
     position: absolute;
+
     width: 45px;
     height: 45px;
-    background-color: #555;
-    border: 3px solid #222;
-    border-radius: 6px;
-    z-index: 24;
-    animation: spinRock 0.6s linear infinite;
+
+    background:
+        radial-gradient(
+            circle at 30% 25%,
+            #999,
+            #555 45%,
+            #222
+        );
+
+    border:
+        3px solid #151515;
+
+    border-radius: 30%;
+
+    z-index: 45;
+
+    box-shadow:
+        0 0 10px
+        rgba(0,0,0,0.8);
+
+    animation:
+        spinRock
+        0.6s linear infinite;
+
 }
+
 
 @keyframes spinRock {
-    100% { transform: rotate(360deg); }
+
+    100% {
+
+        transform:
+            rotate(360deg);
+
+    }
+
 }
 
-/* Modais */
-.modal {
+
+/* ============================================================
+   CONTROLES
+   ============================================================ */
+
+#controls-hint {
+
     position: absolute;
+
+    bottom: 12px;
+
+    left: 50%;
+
+    transform:
+        translateX(-50%);
+
+    background:
+        rgba(0,0,0,0.75);
+
+    padding:
+        8px 18px;
+
+    border-radius:
+        20px;
+
+    font-size:
+        13px;
+
+    color:
+        #ddd;
+
+    z-index: 100;
+
+    border:
+        1px solid
+        #444;
+
+    box-shadow:
+        0 2px 10px
+        rgba(0,0,0,0.6);
+
+}
+
+
+/* ============================================================
+   MODAIS
+   ============================================================ */
+
+.modal {
+
+    position: absolute;
+
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(15, 15, 20, 0.95);
-    padding: 30px 50px;
-    border: 2px solid #ff4444;
-    box-shadow: 0 0 30px rgba(0,0,0,0.8);
-    text-align: center;
+
+    transform:
+        translate(-50%, -50%);
+
+    min-width:
+        350px;
+
+    background:
+        rgba(10,10,15,0.96);
+
+    padding:
+        35px 50px;
+
+    border:
+        2px solid
+        #ff4444;
+
+    box-shadow:
+        0 0 40px
+        rgba(0,0,0,0.9);
+
+    text-align:
+        center;
+
     z-index: 200;
-    border-radius: 8px;
+
+    border-radius:
+        10px;
+
 }
+
 
 .modal h2 {
-    font-size: 32px;
-    margin-bottom: 15px;
-    color: #ff4444;
+
+    font-size:
+        34px;
+
+    margin-bottom:
+        15px;
+
+    color:
+        #ff4444;
+
+    text-shadow:
+        0 0 10px
+        rgba(255,0,0,0.5);
+
 }
+
 
 .modal p {
-    margin-bottom: 20px;
-    font-size: 18px;
+
+    margin-bottom:
+        22px;
+
+    font-size:
+        18px;
+
+    color:
+        #ddd;
+
 }
+
 
 .modal button {
-    padding: 10px 25px;
-    font-size: 16px;
-    font-weight: bold;
-    background-color: #ff4444;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background 0.2s;
+
+    padding:
+        11px 28px;
+
+    font-size:
+        16px;
+
+    font-weight:
+        bold;
+
+    background:
+        #d50000;
+
+    color:
+        white;
+
+    border:
+        none;
+
+    border-radius:
+        5px;
+
+    cursor:
+        pointer;
+
+    transition:
+        0.2s;
+
 }
+
 
 .modal button:hover {
-    background-color: #cc0000;
+
+    background:
+        #ff2222;
+
+    transform:
+        scale(1.05);
+
 }
 
-.hidden { display: none; }
+
+/* ============================================================
+   OCULTO
+   ============================================================ */
+
+.hidden {
+
+    display: none;
+
+}
+
+
+/* ============================================================
+   RESPONSIVO
+   ============================================================ */
+
+@media (max-width: 800px) {
+
+    #hud {
+
+        padding:
+            8px 10px;
+
+        gap: 8px;
+
+        font-size:
+            11px;
+
+        flex-wrap:
+            wrap;
+
+    }
+
+
+    #health-bar-container {
+
+        width: 100px;
+
+        height: 16px;
+
+    }
+
+
+    #controls-hint {
+
+        font-size:
+            10px;
+
+        width:
+            95%;
+
+        text-align:
+            center;
+
+    }
+
+}
