@@ -1,7 +1,8 @@
-// Configurações do Jogo e Elementos
+// Configurações e Elementos Globais
 const container = document.getElementById('game-container');
 const canvas = document.getElementById('game-canvas');
 const background = document.getElementById('game-background');
+
 const hud = {
     health: document.getElementById('health-bar'),
     weapon: document.getElementById('current-weapon'),
@@ -10,12 +11,11 @@ const hud = {
     ammo: document.getElementById('current-ammo')
 };
 
-// Modais
 const pauseModal = document.getElementById('pause-modal');
 const gameOverModal = document.getElementById('game-over-modal');
 const winModal = document.getElementById('win-modal');
 
-// Variáveis de Estado
+// Estados do Jogo
 let isPaused = false;
 let gameOver = false;
 let gameWon = false;
@@ -23,76 +23,101 @@ let gameScore = 0;
 let currentLevel = 1;
 let backgroundOffset = 0;
 
-// Configurações da Fase (Até a fase do Chefe)
+// Configuração dos Níveis
 const LEVEL_MAPS = [
-    { zombies: 5, bgScrollSpeed: 1 }, // Fase 1: Introdução
-    { zombies: 10, bgScrollSpeed: 1.5 }, // Fase 2: Mais rápidos
-    { zombies: 15, bgScrollSpeed: 2 }, // Fase 3: Horda pequena
-    { zombies: 20, bgScrollSpeed: 2.5 }, // Fase 4: Preparação
-    { zombies: 0, boss: true } // Fase 5: O Grande Chefe
+    { zombies: 6, bgSpeed: 1 },
+    { zombies: 12, bgSpeed: 1.5 },
+    { zombies: 18, bgSpeed: 2 },
+    { zombies: 24, bgSpeed: 2.5 },
+    { zombies: 0, boss: true } // Fase 5: Chefe
 ];
 
-// Configurações das Armas
-const weapons = {
-    'Pistola': { ammo: 12, maxAmmo: 30, damage: 20, fireRate: 400, speed: 10, classHeld: 'pistol-held' },
-    'AK47': { ammo: 30, maxAmmo: 90, damage: 15, fireRate: 100, speed: 12, classHeld: 'ak47-held' }
+// Configuração das Armas
+const WEAPONS = {
+    'Pistola': { ammo: 12, maxAmmo: 12, reserveAmmo: 60, damage: 25, fireRate: 300, speed: 14, classHeld: 'pistol-held' },
+    'AK47': { ammo: 30, maxAmmo: 30, reserveAmmo: 120, damage: 18, fireRate: 100, speed: 16, classHeld: 'ak47-held' }
 };
 
 let currentWeaponName = 'Pistola';
-let playerWeapon = weapons[currentWeaponName];
+let activeWeapon = { ...WEAPONS[currentWeaponName] };
 let canFire = true;
 let isReloading = false;
 
-// Entidades (Objetos)
+// Posição do Mouse
+let mousePos = { x: 0, y: 0 };
+
+// Jogador
 let player = {
-    x: 100, y: container.offsetHeight / 2 - 35,
-    width: 40, height: 70, health: 100, speed: 5,
-    element: null, weaponElement: null
+    x: 100,
+    y: container.offsetHeight / 2,
+    width: 36,
+    height: 64,
+    speed: 5,
+    health: 100,
+    element: null,
+    weaponElement: null
 };
 
+// Coleções de Entidades
 let zombies = [];
-let projectiles = [];
+let bullets = [];
 let boss = null;
 let bossProjectiles = [];
 
-// Controles (Teclado e Toque)
-let keys = {};
-let joystickVector = { x: 0, y: 0 };
-let isFiring = false;
+// Teclas Pressionadas
+const keys = {};
 
 // Inicialização
 function init() {
     createPlayer();
     loadLevel(currentLevel);
-    addEventListeners();
+    setupInputs();
     updateHUD();
     requestAnimationFrame(gameLoop);
 }
 
-// Criar o Personagem Jogador (Baseado na descrição)
+// Criação do Personagem (Corpo completo: 2 pernas, 2 braços, 1 cabeça)
 function createPlayer() {
     player.element = document.createElement('div');
     player.element.className = 'player';
-    
-    // Braço segurando arma
-    player.weaponElement = document.createElement('div');
-    player.weaponElement.className = `weapon ${playerWeapon.classHeld}`;
-    player.element.appendChild(playerWeapon.classHeld);
 
-    // Cabeça
-    let head = document.createElement('div');
+    const head = document.createElement('div');
     head.className = 'player-head';
-    head.style.width = '20px'; head.style.height = '20px'; head.style.background = '#ffd700'; head.style.position = 'absolute'; head.style.top = '-20px'; head.style.left = '10px'; head.style.borderRadius = '50%'; head.style.border='2px solid white';
+
+    const body = document.createElement('div');
+    body.className = 'player-body';
+
+    const armLeft = document.createElement('div');
+    armLeft.className = 'player-arm left';
+
+    const armRight = document.createElement('div');
+    armRight.className = 'player-arm right';
+
+    const legLeft = document.createElement('div');
+    legLeft.className = 'player-leg left';
+
+    const legRight = document.createElement('div');
+    legRight.className = 'player-leg right';
+
+    player.weaponElement = document.createElement('div');
+    player.weaponElement.className = `weapon ${activeWeapon.classHeld}`;
+
     player.element.appendChild(head);
+    player.element.appendChild(body);
+    player.element.appendChild(armLeft);
+    player.element.appendChild(armRight);
+    player.element.appendChild(legLeft);
+    player.element.appendChild(legRight);
+    player.element.appendChild(player.weaponElement);
 
     canvas.appendChild(player.element);
 }
 
-// Carregar o Nível
+// Carregar Fase
 function loadLevel(level) {
     clearZombies();
     const map = LEVEL_MAPS[level - 1];
-    
+
     if (map.boss) {
         createBoss();
     } else {
@@ -103,168 +128,181 @@ function loadLevel(level) {
     }
 }
 
-// Loop Principal do Jogo
+// Configuração dos Controles de PC
+function setupInputs() {
+    window.addEventListener('keydown', e => {
+        keys[e.key.toLowerCase()] = true;
+
+        if (e.key.toLowerCase() === 'r') reloadWeapon();
+        if (e.key.toLowerCase() === 'q') swapWeapon();
+        if (e.key.toLowerCase() === 'p') togglePause();
+    });
+
+    window.addEventListener('keyup', e => {
+        keys[e.key.toLowerCase()] = false;
+    });
+
+    window.addEventListener('mousemove', e => {
+        mousePos.x = e.clientX;
+        mousePos.y = e.clientY;
+    });
+
+    window.addEventListener('mousedown', e => {
+        if (e.button === 0) keys['click'] = true;
+    });
+
+    window.addEventListener('mouseup', e => {
+        if (e.button === 0) keys['click'] = false;
+    });
+}
+
+// Loop Principal
 function gameLoop() {
-    if (isPaused || gameOver || gameWon) return;
-
-    handleInput();
-    updateProjectiles();
-    updateZombies();
-    if (boss) updateBoss();
-    updateBackground();
-    checkCollisions();
-    updateHUD();
-
+    if (!isPaused && !gameOver && !gameWon) {
+        updatePlayer();
+        updateBullets();
+        updateZombies();
+        if (boss) updateBoss();
+        checkCollisions();
+        updateBackground();
+        updateHUD();
+    }
     requestAnimationFrame(gameLoop);
 }
 
-// Entrada de Controles (Teclado)
-function addEventListeners() {
-    window.addEventListener('keydown', e => { keys[e.key.toLowerCase()] = true; });
-    window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
-    window.addEventListener('mousedown', () => isFiring = true );
-    window.addEventListener('mouseup', () => isFiring = false );
+// Atualizar Movimento e Mira do Jogador
+function updatePlayer() {
+    let vx = 0;
+    let vy = 0;
 
-    // Controles de Toque (Simplificados)
-    document.getElementById('btn-fire').addEventListener('touchstart', () => isFiring = true );
-    document.getElementById('btn-fire').addEventListener('touchend', () => isFiring = false );
-    document.getElementById('btn-reload').addEventListener('touchstart', reloadWeapon);
-    document.getElementById('btn-weapon-swap').addEventListener('touchstart', swapWeapon);
-    
-    // Joystick Virtual (Esboço rápido)
-    const knob = document.getElementById('joystick-knob');
-    let joystickOrigin = null;
+    if (keys['w'] || keys['arrowup']) vy -= 1;
+    if (keys['s'] || keys['arrowdown']) vy += 1;
+    if (keys['a'] || keys['arrowleft']) vx -= 1;
+    if (keys['d'] || keys['arrowright']) vx += 1;
 
-    document.getElementById('joystick').addEventListener('touchstart', e => {
-        joystickOrigin = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-    });
-    
-    document.getElementById('joystick').addEventListener('touchmove', e => {
-        if (!joystickOrigin) return;
-        let dx = e.touches[0].clientX - joystickOrigin.x;
-        let dy = e.touches[0].clientY - joystickOrigin.y;
-        let dist = Math.min(50, Math.sqrt(dx*dx + dy*dy));
-        let angle = Math.atan2(dy, dx);
-        
-        knob.style.transform = `translate(${Math.cos(angle)*dist}px, ${Math.sin(angle)*dist}px)`;
-        joystickVector = { x: Math.cos(angle)*(dist/50), y: Math.sin(angle)*(dist/50) };
-    });
+    // Normalização para movimento diagonal uniforme
+    if (vx !== 0 && vy !== 0) {
+        vx *= 0.7071;
+        vy *= 0.7071;
+    }
 
-    document.getElementById('joystick').addEventListener('touchend', () => {
-        knob.style.transform = 'translate(0, 0)';
-        joystickVector = { x: 0, y: 0 };
-        joystickOrigin = null;
-    });
+    player.x = Math.max(0, Math.min(container.offsetWidth - player.width, player.x + vx * player.speed));
+    player.y = Math.max(80, Math.min(container.offsetHeight - player.height, player.y + vy * player.speed));
 
-    document.getElementById('pause-btn').addEventListener('click', togglePause);
-}
-
-// Tratar Entrada e Mover Jogador
-function handleInput() {
-    // Mover (Teclado e Joystick)
-    let vx = (keys['a'] || keys['arrowleft'] ? -1 : 0) + (keys['d'] || keys['arrowright'] ? 1 : 0) + joystickVector.x;
-    let vy = (keys['w'] || keys['arrowup'] ? -1 : 0) + (keys['s'] || keys['arrowdown'] ? 1 : 0) + joystickVector.y;
-
-    let moveX = vx * player.speed;
-    let moveY = vy * player.speed;
-
-    // Manter dentro do container
-    player.x = Math.max(0, Math.min(container.offsetWidth - player.width, player.x + moveX));
-    player.y = Math.max(0, Math.min(container.offsetHeight - player.height, player.y + moveY));
-
-    // Atualizar posição visual
     player.element.style.left = `${player.x}px`;
     player.element.style.top = `${player.y}px`;
 
-    // Atirar
-    if (isFiring && canFire && !isReloading) {
-        fireProjectile();
+    // Rotacionar Arma em Direção ao Mouse
+    const playerCenterX = player.x + player.width / 2;
+    const playerCenterY = player.y + player.height / 2;
+    const angle = Math.atan2(mousePos.y - playerCenterY, mousePos.x - playerCenterX);
+    player.weaponElement.style.transform = `rotate(${angle}rad)`;
+
+    // Disparo contínuo ou simples
+    if (keys['click'] && canFire && !isReloading) {
+        fireBullet(angle);
     }
 }
 
-// Atirar
-function fireProjectile() {
-    if (playerWeapon.ammo <= 0) return;
+// Disparo de Projétil
+function fireBullet(angle) {
+    if (activeWeapon.ammo <= 0) {
+        reloadWeapon();
+        return;
+    }
+
     canFire = false;
-    playerWeapon.ammo--;
+    activeWeapon.ammo--;
 
-    let projEl = document.createElement('div');
-    projEl.className = 'projectile';
-    projEl.style.left = `${player.x + player.width}px`;
-    projEl.style.top = `${player.y + 30}px`;
-    canvas.appendChild(projEl);
+    const bulletEl = document.createElement('div');
+    bulletEl.className = 'bullet';
+    canvas.appendChild(bulletEl);
 
-    projectiles.push({
-        x: player.x + player.width,
-        y: player.y + 30,
-        element: projEl,
-        damage: playerWeapon.damage,
-        speed: playerWeapon.speed
+    const startX = player.x + player.width / 2;
+    const startY = player.y + 26;
+
+    bullets.push({
+        x: startX,
+        y: startY,
+        vx: Math.cos(angle) * activeWeapon.speed,
+        vy: Math.sin(angle) * activeWeapon.speed,
+        damage: activeWeapon.damage,
+        element: bulletEl
     });
 
-    setTimeout(() => { canFire = true; }, playerWeapon.fireRate);
+    setTimeout(() => { canFire = true; }, activeWeapon.fireRate);
 }
 
-// Atualizar Projéteis
-function updateProjectiles() {
-    projectiles.forEach((proj, index) => {
-        proj.x += proj.speed;
-        proj.element.style.left = `${proj.x}px`;
-        
-        // Remove se sair da tela
-        if (proj.x > container.offsetWidth) {
-            proj.element.remove();
-            projectiles.splice(index, 1);
+// Atualizar Projéteis do Jogador e do Chefe
+function updateBullets() {
+    bullets.forEach((b, index) => {
+        b.x += b.vx;
+        b.y += b.vy;
+        b.element.style.left = `${b.x}px`;
+        b.element.style.top = `${b.y}px`;
+
+        if (b.x < 0 || b.x > container.offsetWidth || b.y < 0 || b.y > container.offsetHeight) {
+            b.element.remove();
+            bullets.splice(index, 1);
         }
     });
 
-    bossProjectiles.forEach((proj, index) => {
-        proj.x -= proj.speed;
-        proj.element.style.left = `${proj.x}px`;
-        if (proj.x < 0) {
-            proj.element.remove();
+    bossProjectiles.forEach((p, index) => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.element.style.left = `${p.x}px`;
+        p.element.style.top = `${p.y}px`;
+
+        if (p.x < 0 || p.x > container.offsetWidth || p.y < 0 || p.y > container.offsetHeight) {
+            p.element.remove();
             bossProjectiles.splice(index, 1);
         }
     });
 }
 
-// Spawn Zumbi Comum
+// Gerar Zumbi
 function spawnZombie() {
-    let zombieEl = document.createElement('div');
-    zombieEl.className = 'zombie';
-    let zX = container.offsetWidth + Math.random() * 200;
-    let zY = Math.random() * (container.offsetHeight - 70);
-    zombieEl.style.left = `${zX}px`;
-    zombieEl.style.top = `${zY}px`;
-    canvas.appendChild(zombieEl);
+    const zEl = document.createElement('div');
+    zEl.className = 'zombie';
+    canvas.appendChild(zEl);
+
+    const spawnX = container.offsetWidth + Math.random() * 300;
+    const spawnY = 80 + Math.random() * (container.offsetHeight - 150);
 
     zombies.push({
-        x: zX, y: zY, element: zombieEl, health: 30, speed: 0.5 + Math.random() * 1.0
+        x: spawnX,
+        y: spawnY,
+        width: 36,
+        height: 64,
+        health: 50,
+        speed: 1 + Math.random() * 1.5,
+        element: zEl
     });
 }
 
-// Atualizar Zumbis (Perseguir jogador)
+// Atualizar Zumbis
 function updateZombies() {
-    zombies.forEach((zom, index) => {
-        let dx = player.x - zom.x;
-        let dy = player.y - zom.y;
-        let dist = Math.sqrt(dx*dx + dy*dy);
-        
-        if (dist > 5) {
-            zom.x += (dx/dist) * zom.speed;
-            zom.y += (dy/dist) * zom.speed;
-            zom.element.style.left = `${zom.x}px`;
-            zom.element.style.top = `${zom.y}px`;
+    zombies.forEach((z) => {
+        const dx = player.x - z.x;
+        const dy = player.y - z.y;
+        const dist = Math.hypot(dx, dy);
+
+        if (dist > 0) {
+            z.x += (dx / dist) * z.speed;
+            z.y += (dy / dist) * z.speed;
         }
 
-        // Colisão Dano Zumbi -> Player
-        if (checkRectCollision(player, zom)) {
-            takeDamage(0.1); // Dano por contato
+        z.element.style.left = `${z.x}px`;
+        z.element.style.top = `${z.y}px`;
+
+        // Dano de Contato no Jogador
+        if (checkRectCollision(player, z)) {
+            takeDamage(0.2);
         }
     });
 }
 
-// Limpar zumbis ao mudar de fase
+// Limpar Inimigos da Fase
 function clearZombies() {
     zombies.forEach(z => z.element.remove());
     zombies = [];
@@ -274,118 +312,113 @@ function clearZombies() {
 
 // --- CHEFE ZUMBI (Fase 5) ---
 function createBoss() {
-    boss = {
-        x: container.offsetWidth - 120,
-        y: container.offsetHeight / 2 - 75,
-        width: 80, height: 150,
-        health: 2000, maxHealth: 2000,
-        element: null,
-        abilityCooldown: 3000,
-        lastAbility: 0
-    };
+    const bEl = document.createElement('div');
+    bEl.className = 'boss-zombie';
+    canvas.appendChild(bEl);
 
-    boss.element = document.createElement('div');
-    boss.element.className = 'boss-zombie';
-    boss.element.style.left = `${boss.x}px`;
-    boss.element.style.top = `${boss.y}px`;
-    canvas.appendChild(boss.element);
+    boss = {
+        x: container.offsetWidth - 150,
+        y: container.offsetHeight / 2 - 80,
+        width: 90,
+        height: 160,
+        health: 1500,
+        maxHealth: 1500,
+        element: bEl,
+        lastAbilityTime: Date.now(),
+        abilityCooldown: 2500
+    };
 }
 
 function updateBoss() {
-    // Chefe se move lentamente para cima e para baixo
-    let yMove = Math.sin(Date.now() / 1000) * 1.5;
-    boss.y += yMove;
+    // Movimento do Chefe
+    boss.y += Math.sin(Date.now() / 800) * 2;
+    boss.element.style.left = `${boss.x}px`;
     boss.element.style.top = `${boss.y}px`;
 
-    // Usar Habilidades Especiais
-    let now = Date.now();
-    if (now - boss.lastAbility > boss.abilityCooldown) {
-        let r = Math.random();
-        if (r < 0.6) {
-            bossAbilitySpawn(); // Invocação (Mais comum)
+    // Uso de Habilidades
+    const now = Date.now();
+    if (now - boss.lastAbilityTime > boss.abilityCooldown) {
+        if (Math.random() < 0.5) {
+            bossAbilitySummon();
         } else {
-            bossAbilityThrow(); // Joga pedra
+            bossAbilityThrowRock();
         }
-        boss.lastAbility = now;
-        boss.abilityCooldown = 2000 + Math.random() * 2000; // Tempo aleatório para o próximo
+        boss.lastAbilityTime = now;
     }
 }
 
-// Habilidade 1: Criar Zumbis (Horda)
-function bossAbilitySpawn() {
-    console.log("Chefe invoca horda!");
-    let num = 3 + Math.random() * 3;
-    for(let i=0; i<num; i++){
+// Habilidade 1: Invocar Zumbis
+function bossAbilitySummon() {
+    for (let i = 0; i < 3; i++) {
         spawnZombie();
     }
 }
 
-// Habilidade 2: Joga Bloco de Pedra
-function bossAbilityThrow() {
-    console.log("Chefe joga pedra!");
-    let rockEl = document.createElement('div');
+// Habilidade 2: Lançar Bloco de Pedra em Direção ao Jogador
+function bossAbilityThrowRock() {
+    const rockEl = document.createElement('div');
     rockEl.className = 'rock-projectile';
-    rockEl.style.left = `${boss.x - 20}px`;
-    rockEl.style.top = `${boss.y + 50}px`;
     canvas.appendChild(rockEl);
 
+    const startX = boss.x;
+    const startY = boss.y + boss.height / 2;
+    const angle = Math.atan2(player.y - startY, player.x - startX);
+
     bossProjectiles.push({
-        x: boss.x - 20,
-        y: boss.y + 50,
-        element: rockEl,
-        damage: 15,
-        speed: 6,
-        type: 'rock'
+        x: startX,
+        y: startY,
+        width: 45,
+        height: 45,
+        vx: Math.cos(angle) * 7,
+        vy: Math.sin(angle) * 7,
+        damage: 25,
+        element: rockEl
     });
 }
-
-// --- Mecânicas ---
 
 // Verificação de Colisões
 function checkCollisions() {
-    // Projéteis do Player -> Zumbis
-    projectiles.forEach((proj, pIndex) => {
-        // Zumbis Comuns
-        zombies.forEach((zom, zIndex) => {
-            if (checkPointRectCollision(proj, zom)) {
-                zom.health -= proj.damage;
-                proj.element.remove();
-                projectiles.splice(pIndex, 1);
+    // Projéteis do Jogador -> Zumbis
+    bullets.forEach((b, bIdx) => {
+        zombies.forEach((z, zIdx) => {
+            if (checkPointRectCollision(b, z)) {
+                z.health -= b.damage;
+                b.element.remove();
+                bullets.splice(bIdx, 1);
 
-                if (zom.health <= 0) {
-                    zom.element.remove();
-                    zombies.splice(zIndex, 1);
-                    gameScore += 10;
-                    checkLevelComplete();
+                if (z.health <= 0) {
+                    z.element.remove();
+                    zombies.splice(zIdx, 1);
+                    gameScore += 20;
+                    checkLevelProgress();
                 }
-                return;
             }
         });
 
-        // Chefe (se existir)
-        if (boss && checkPointRectCollision(proj, boss)) {
-            boss.health -= proj.damage;
-            proj.element.remove();
-            projectiles.splice(pIndex, 1);
+        // Projéteis -> Chefe
+        if (boss && checkPointRectCollision(b, boss)) {
+            boss.health -= b.damage;
+            b.element.remove();
+            bullets.splice(bIdx, 1);
+
             if (boss.health <= 0) {
                 defeatBoss();
             }
-            return;
         }
     });
 
-    // Projéteis do Chefe (Pedra) -> Player
-    bossProjectiles.forEach((proj, pIndex) => {
-        if (checkPointRectCollision(proj, player)) {
-            takeDamage(proj.damage);
-            proj.element.remove();
-            bossProjectiles.splice(pIndex, 1);
+    // Projéteis do Chefe -> Jogador
+    bossProjectiles.forEach((p, pIdx) => {
+        if (checkRectCollision(p, player)) {
+            takeDamage(p.damage);
+            p.element.remove();
+            bossProjectiles.splice(pIdx, 1);
         }
     });
 }
 
-function checkLevelComplete() {
-    if (boss) return; // Não completa fase enquanto o chefe está vivo
+function checkLevelProgress() {
+    if (boss) return;
 
     if (zombies.length === 0 && currentLevel < 5) {
         currentLevel++;
@@ -399,78 +432,77 @@ function defeatBoss() {
     winModal.classList.remove('hidden');
 }
 
-function takeDamage(dmg) {
-    player.health -= dmg;
+function takeDamage(amount) {
+    player.health -= amount;
     if (player.health <= 0 && !gameOver) {
-        triggerGameOver();
+        gameOver = true;
+        document.getElementById('final-level').innerText = currentLevel;
+        gameOverModal.classList.remove('hidden');
     }
 }
 
-// Rolagem do Fundo
+// Rolagem de Fundo Parallax
 function updateBackground() {
     const map = LEVEL_MAPS[currentLevel - 1];
     if (!boss && player.x > container.offsetWidth * 0.4) {
-        backgroundOffset -= map.bgScrollSpeed;
+        backgroundOffset -= map.bgSpeed;
         background.style.transform = `translateX(${backgroundOffset}px)`;
-        // Faz zumbis se moverem junto com o fundo
-        zombies.forEach(z => z.x -= map.bgScrollSpeed);
+        zombies.forEach(z => z.x -= map.bgSpeed);
     }
 }
 
-// Troca de Arma (Pistola <-> AK47)
+// Mecânica de Troca de Armas (Pistola / AK47)
 function swapWeapon() {
     currentWeaponName = currentWeaponName === 'Pistola' ? 'AK47' : 'Pistola';
-    playerWeapon = weapons[currentWeaponName];
-    // Atualiza braço visual
-    player.weaponElement.className = `weapon ${playerWeapon.classHeld}`;
+    activeWeapon = { ...WEAPONS[currentWeaponName] };
+    player.weaponElement.className = `weapon ${activeWeapon.classHeld}`;
     updateHUD();
 }
 
-// Recarregar
+// Recarga de Arma
 function reloadWeapon() {
-    if (playerWeapon.ammo >= playerWeapon.maxAmmo || isReloading) return;
+    if (isReloading || activeWeapon.ammo === activeWeapon.maxAmmo) return;
+
     isReloading = true;
-    hud.weapon.innerText = `... Recarregando (${currentWeaponName}) ...`;
+    hud.weapon.innerText = 'Recarregando...';
+
     setTimeout(() => {
-        playerWeapon.ammo = playerWeapon.maxAmmo;
+        activeWeapon.ammo = activeWeapon.maxAmmo;
         isReloading = false;
         updateHUD();
-    }, currentWeaponName === 'AK47' ? 1500 : 1000);
+    }, currentWeaponName === 'AK47' ? 1400 : 900);
 }
 
-// Utilidades
-function checkRectCollision(rect1, rect2) {
-    return rect1.x < rect2.x + rect2.width && rect1.x + rect1.width > rect2.x && rect1.y < rect2.y + rect2.height && rect1.y + rect1.height > rect2.y;
+// Utilitários de Colisão
+function checkRectCollision(r1, r2) {
+    return r1.x < r2.x + r2.width &&
+           r1.x + r1.width > r2.x &&
+           r1.y < r2.y + r2.height &&
+           r1.y + r1.height > r2.y;
 }
 
-function checkPointRectCollision(point, rect) {
-    return point.x >= rect.x && point.x <= rect.x + rect.width && point.y >= rect.y && point.y <= rect.y + rect.height;
+function checkPointRectCollision(pt, r) {
+    return pt.x >= r.x && pt.x <= r.x + r.width &&
+           pt.y >= r.y && pt.y <= r.y + r.height;
 }
 
+// Atualizar Interface
 function updateHUD() {
-    hud.health.style.width = `${player.health}%`;
-    hud.weapon.innerText = isReloading ? `Recarregando...` : currentWeaponName;
+    hud.health.style.width = `${Math.max(0, player.health)}%`;
+    hud.weapon.innerText = isReloading ? 'Recarregando...' : currentWeaponName;
     hud.level.innerText = `${currentLevel}/5${LEVEL_MAPS[currentLevel - 1].boss ? ' (CHEFE)' : ''}`;
     hud.score.innerText = gameScore;
-    hud.ammo.innerText = isReloading ? '--' : `${playerWeapon.ammo}/${playerWeapon.maxAmmo}`;
+    hud.ammo.innerText = `${activeWeapon.ammo}/${activeWeapon.maxAmmo}`;
 }
 
-// Estados do Jogo
 function togglePause() {
     isPaused = !isPaused;
     pauseModal.classList.toggle('hidden');
-    if (!isPaused) requestAnimationFrame(gameLoop);
-}
-
-function triggerGameOver() {
-    gameOver = true;
-    document.getElementById('final-level').innerText = currentLevel;
-    gameOverModal.classList.remove('hidden');
 }
 
 function restartGame() {
-    location.reload(); // Maneira mais simples de reiniciar
+    location.reload();
 }
 
-// Começar o jogo
+// Iniciar Jogo
 init();

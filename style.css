@@ -1,107 +1,123 @@
-body, html {
+* {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
+}
+
+body, html {
     width: 100%;
     height: 100%;
     overflow: hidden;
-    font-family: 'Courier New', Courier, monospace; /* Fonte de estilo militar/rústico */
-    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #fff;
     user-select: none;
+    background-color: #000;
 }
 
 #game-container {
     width: 100vw;
     height: 100vh;
-    background-color: #2c2c2c;
     position: relative;
     overflow: hidden;
+    cursor: crosshair; /* Mira do mouse */
 }
 
 /* --- Fundo Pós-Apocalíptico --- */
 .background {
     position: absolute;
-    width: 300%; /* Para rolagem parallax */
+    width: 200%;
     height: 100%;
-    background: linear-gradient(to bottom, #4a3c2c, #1a1a1a);
+    background: linear-gradient(to bottom, #2b1f1d 0%, #111115 100%);
     z-index: 1;
 }
 
 .destroyed-buildings {
     position: absolute;
     width: 100%;
-    height: 60%;
+    height: 65%;
     bottom: 0;
-    background:
-        linear-gradient(90deg, rgba(50,50,50,0.8) 0%, rgba(50,50,50,0) 100%),
-        repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(30,30,30,0.3) 10px, rgba(30,30,30,0.3) 20px),
-        /* Representando prédios em ruínas */
-        repeating-linear-gradient(to right, rgba(20,20,20,0.5), rgba(20,20,20,0.5) 150px, transparent 150px, transparent 300px);
-    opacity: 0.7;
+    background: 
+        repeating-linear-gradient(to right, #181818 0px, #181818 120px, transparent 120px, transparent 220px),
+        repeating-linear-gradient(to right, #0d0d0d 0px, #0d0d0d 80px, transparent 80px, transparent 150px);
+    opacity: 0.85;
 }
 
 .burning-houses {
     position: absolute;
     width: 100%;
-    height: 30%;
+    height: 35%;
     bottom: 0;
-    background:
-        /* Fogo distante */
-        radial-gradient(circle at 10% 80%, rgba(255, 69, 0, 0.4) 0%, rgba(255, 69, 0, 0) 50%),
-        radial-gradient(circle at 40% 90%, rgba(255, 140, 0, 0.3) 0%, rgba(255, 140, 0, 0) 40%),
-        radial-gradient(circle at 70% 85%, rgba(255, 69, 0, 0.5) 0%, rgba(255, 69, 0, 0) 60%),
-        /* Silhuetas de casas */
-        repeating-linear-gradient(to right, #333 0px, #333 50px, transparent 50px, transparent 100px);
-    background-position: bottom;
-    animation: fireFlicker 2s infinite ease-in-out;
+    background: 
+        radial-gradient(circle at 15% 80%, rgba(255, 68, 0, 0.4) 0%, transparent 40%),
+        radial-gradient(circle at 50% 85%, rgba(255, 140, 0, 0.5) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255, 68, 0, 0.4) 0%, transparent 40%),
+        repeating-linear-gradient(to right, #251105 0px, #251105 60px, transparent 60px, transparent 140px);
+    animation: fireGlow 1.5s infinite alternate ease-in-out;
 }
 
-@keyframes fireFlicker {
-    0%, 100% { opacity: 0.8; }
-    50% { opacity: 1.0; }
+@keyframes fireGlow {
+    0% { opacity: 0.7; }
+    100% { opacity: 1; }
 }
 
-/* --- HUD (Interface) --- */
+/* --- HUD / Interface PC --- */
 #hud {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-    height: auto;
-    padding: 10px;
+    padding: 15px 25px;
     z-index: 100;
-    display: grid;
-    grid-template-columns: 1fr auto auto auto;
-    gap: 10px;
-    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: space-between;
     align-items: center;
+    background: rgba(0, 0, 0, 0.7);
+    border-bottom: 2px solid #444;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.hud-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.hud-label {
+    color: #ff4444;
 }
 
 #health-bar-container {
     width: 200px;
-    height: 15px;
-    background-color: #333;
-    border: 2px solid white;
+    height: 20px;
+    background-color: #222;
+    border: 2px solid #888;
+    border-radius: 3px;
+    overflow: hidden;
 }
 
 #health-bar {
     width: 100%;
     height: 100%;
-    background-color: #ff4500; /* Vermelho/laranja de sangue */
-    transition: width 0.2s ease;
+    background-color: #ff3333;
+    transition: width 0.1s linear;
 }
 
-#pause-btn {
-    width: 40px;
-    height: 40px;
-    background: #555;
-    color: white;
-    border: none;
-    cursor: pointer;
-    border-radius: 50%;
-    font-size: 20px;
+#controls-hint {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.6);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    color: #aaa;
+    z-index: 100;
+    border: 1px solid #333;
 }
 
-/* --- Area de Jogo e Entidades --- */
+/* --- Elementos do Jogo --- */
 #game-canvas {
     position: absolute;
     width: 100%;
@@ -109,145 +125,130 @@ body, html {
     z-index: 10;
 }
 
+/* Jogador (2 pernas, 2 braços, 1 cabeça) */
 .player {
     position: absolute;
-    background-color: #4477aa; /* Uniforme de sobrevivente */
-    width: 40px;
-    height: 70px;
-    border-radius: 5px;
-    border: 2px solid white;
+    width: 36px;
+    height: 64px;
     z-index: 20;
 }
 
+.player-head {
+    position: absolute;
+    top: 0;
+    left: 8px;
+    width: 20px;
+    height: 20px;
+    background-color: #ffcc99;
+    border-radius: 50%;
+    border: 2px solid #000;
+}
+
+.player-body {
+    position: absolute;
+    top: 20px;
+    left: 8px;
+    width: 20px;
+    height: 24px;
+    background-color: #2b5b84;
+    border: 2px solid #000;
+}
+
+.player-arm {
+    position: absolute;
+    top: 22px;
+    width: 6px;
+    height: 18px;
+    background-color: #ffcc99;
+    border: 1px solid #000;
+}
+
+.player-arm.left { left: 2px; }
+.player-arm.right { right: 2px; }
+
+.player-leg {
+    position: absolute;
+    bottom: 0;
+    width: 8px;
+    height: 20px;
+    background-color: #333;
+    border: 1px solid #000;
+}
+
+.player-leg.left { left: 8px; }
+.player-leg.right { right: 20px; }
+
+/* Armas nas mãos */
 .weapon {
     position: absolute;
-    top: 30px;
-    left: 10px;
-    height: 10px;
-    border-radius: 5px;
+    top: 26px;
+    left: 20px;
+    transform-origin: left center;
+    z-index: 21;
 }
 
 .pistol-held {
-    width: 30px;
-    background-color: silver;
+    width: 18px;
+    height: 6px;
+    background-color: #888;
+    border: 1px solid #000;
 }
 
 .ak47-held {
-    width: 50px;
-    background-color: #7f6000;
-    border: 1px solid black;
+    width: 34px;
+    height: 8px;
+    background-color: #8b5a2b;
+    border: 1px solid #000;
 }
 
+/* Inimigos */
 .zombie {
     position: absolute;
-    background-color: #55aa55; /* Verde zumbi */
-    width: 35px;
-    height: 65px;
-    border-radius: 5px;
+    width: 36px;
+    height: 64px;
+    background-color: #4d7c38;
+    border: 2px solid #1e3314;
+    border-radius: 4px;
     z-index: 15;
 }
 
-/* Grande Chefe Zumbi */
+/* Chefe Zumbi */
 .boss-zombie {
     position: absolute;
-    background-color: #4400aa; /* Roxo/Preto de chefe, como na img 0 */
-    width: 80px;
-    height: 150px;
-    border-radius: 10px;
-    border: 4px solid #ff4500;
+    width: 90px;
+    height: 160px;
+    background-color: #5a2a7a;
+    border: 4px solid #8a3ab9;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(138, 58, 185, 0.6);
     z-index: 16;
 }
 
-.projectile {
+/* Projéteis */
+.bullet {
     position: absolute;
     width: 8px;
-    height: 8px;
-    background-color: yellow;
-    border-radius: 50%;
+    height: 4px;
+    background-color: #ffea00;
+    border-radius: 2px;
+    box-shadow: 0 0 4px #ffea00;
     z-index: 25;
 }
 
-/* Bloco de Pedra do Chefe */
 .rock-projectile {
-    background-color: #777;
-    width: 40px;
-    height: 40px;
-    border-radius: 0; /* Quadrado */
-    animation: rockSpin 1s infinite linear;
-}
-
-@keyframes rockSpin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-/* --- Controles de Toque (baseados nas imagens) --- */
-#touch-controls {
     position: absolute;
-    bottom: 20px;
-    width: 100%;
-    height: auto;
-    z-index: 50;
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    justify-content: space-between;
-    padding: 0 20px;
-    pointer-events: none; /* Deixa cliques passarem */
+    width: 45px;
+    height: 45px;
+    background-color: #555;
+    border: 3px solid #222;
+    border-radius: 6px;
+    z-index: 24;
+    animation: spinRock 0.6s linear infinite;
 }
 
-#touch-controls button, #joystick {
-    pointer-events: auto; /* Reativa cliques */
+@keyframes spinRock {
+    100% { transform: rotate(360deg); }
 }
-
-#joystick {
-    grid-column: 1;
-    width: 120px;
-    height: 120px;
-    position: relative;
-}
-
-.joystick-ring {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    border: 6px solid rgba(255,255,255,0.4);
-    border-radius: 50%;
-}
-
-#joystick-knob {
-    position: absolute;
-    width: 60px;
-    height: 60px;
-    background-color: rgba(255,255,255,0.7);
-    border-radius: 50%;
-    top: 30px;
-    left: 30px;
-    transition: 0.1s;
-}
-
-#btn-fire {
-    grid-column: 3;
-    width: 100px;
-    height: 100px;
-    background-color: rgba(255, 69, 0, 0.6);
-    border: 6px solid white;
-    border-radius: 50%;
-    align-self: center;
-    justify-self: center;
-}
-
-#btn-reload, #btn-weapon-swap {
-    width: 60px;
-    height: 60px;
-    background-color: rgba(100,100,100,0.6);
-    color: white;
-    border: 2px solid white;
-    border-radius: 50%;
-    font-size: 24px;
-}
-
-#btn-reload { grid-column: 2; align-self: end; justify-self: start; }
-#btn-weapon-swap { grid-column: 2; align-self: end; justify-self: end; }
 
 /* Modais */
 .modal {
@@ -255,18 +256,40 @@ body, html {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: rgba(0,0,0,0.9);
-    padding: 40px;
-    border: 4px solid white;
+    background: rgba(15, 15, 20, 0.95);
+    padding: 30px 50px;
+    border: 2px solid #ff4444;
+    box-shadow: 0 0 30px rgba(0,0,0,0.8);
     text-align: center;
     z-index: 200;
+    border-radius: 8px;
+}
+
+.modal h2 {
+    font-size: 32px;
+    margin-bottom: 15px;
+    color: #ff4444;
+}
+
+.modal p {
+    margin-bottom: 20px;
+    font-size: 18px;
 }
 
 .modal button {
-    padding: 10px 20px;
-    font-size: 18px;
+    padding: 10px 25px;
+    font-size: 16px;
+    font-weight: bold;
+    background-color: #ff4444;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
     cursor: pointer;
-    margin-top: 20px;
+    transition: background 0.2s;
+}
+
+.modal button:hover {
+    background-color: #cc0000;
 }
 
 .hidden { display: none; }
