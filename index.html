@@ -3,21 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apocalypse Survivor 2D</title>
+    <title>Apocalipse Zumbi</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="game-container">
+        <div id="hud">
+            <div>Vida: <span id="hp">100</span>%</div>
+            <div>Fase: <span id="level">1</span>/5</div>
+            <div>Arma: <span id="weapon-name">Pistola</span></div>
+            <div>Inimigos: <span id="enemy-count">0</span></div>
+        </div>
         <canvas id="gameCanvas" width="800" height="400"></canvas>
-        <div id="ui">
-            <div id="hud">
-                <p>Vida: <span id="player-hp">100</span></p>
-                <p>Arma: <span id="weapon-name">Pistola</span></p>
-                <p>Fase: <span id="stage-num">1</span></p>
-            </div>
-            <div id="controls-info">
-                [A/D] Mover | [Espaço] Pular | [1/2] Trocar Arma | [Clique] Atirar
-            </div>
+        <div id="controls-info">
+            Controles: <b>A / D</b> (Mover) | <b>Q / 1 / 2</b> (Trocar Arma) | <b>Clique do Mouse</b> (Atirar)
         </div>
     </div>
     <script src="script.js"></script>
