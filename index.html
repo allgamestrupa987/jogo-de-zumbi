@@ -3,15 +3,561 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Apocalipse Zumbi: Sobrevivente</title>
-    <link rel="stylesheet" href="style.css">
+
+    <style>
+        /* ============================================================
+           CONFIGURAÇÃO GERAL
+           ============================================================ */
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+
+            font-family:
+                'Segoe UI',
+                Tahoma,
+                Geneva,
+                Verdana,
+                sans-serif;
+
+            color: white;
+            user-select: none;
+            background: #000;
+        }
+
+        /* ============================================================
+           CONTAINER DO JOGO
+           ============================================================ */
+
+        #game-container {
+            width: 100vw;
+            height: 100vh;
+
+            position: relative;
+            overflow: hidden;
+
+            cursor: crosshair;
+        }
+
+        /* ============================================================
+           FUNDO
+           ============================================================ */
+
+        .background {
+            position: absolute;
+
+            top: 0;
+            left: 0;
+
+            width: 300%;
+            height: 100%;
+
+            z-index: 1;
+
+            background-image:
+                url("./images (5).jpg");
+
+            background-size: cover;
+            background-position: center center;
+            background-repeat: repeat-x;
+
+            will-change: transform;
+        }
+
+        .background-overlay {
+            position: absolute;
+            inset: 0;
+
+            background:
+                linear-gradient(
+                    rgba(0, 0, 0, 0.15),
+                    rgba(0, 0, 0, 0.45)
+                );
+
+            pointer-events: none;
+        }
+
+        /* ============================================================
+           HUD
+           ============================================================ */
+
+        #hud {
+            position: absolute;
+
+            top: 0;
+            left: 0;
+
+            width: 100%;
+            min-height: 70px;
+
+            padding: 12px 22px;
+
+            z-index: 100;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            gap: 20px;
+
+            background: rgba(0, 0, 0, 0.75);
+
+            border-bottom:
+                2px solid
+                rgba(255, 255, 255, 0.2);
+
+            font-weight: bold;
+            letter-spacing: 1px;
+
+            text-shadow:
+                2px 2px 3px black;
+        }
+
+        .hud-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .hud-label {
+            color: #ff4444;
+        }
+
+        /* ============================================================
+           VIDA
+           ============================================================ */
+
+        #health-bar-container {
+            width: 180px;
+            height: 20px;
+
+            background: #171717;
+
+            border:
+                2px solid
+                #888;
+
+            border-radius: 4px;
+            overflow: hidden;
+
+            box-shadow:
+                inset 0 0 5px #000;
+        }
+
+        #health-bar {
+            width: 100%;
+            height: 100%;
+
+            background:
+                linear-gradient(
+                    to bottom,
+                    #ff5555,
+                    #b80000
+                );
+
+            transition:
+                width 0.1s linear;
+        }
+
+        /* ============================================================
+           ÁREA DO JOGO
+           ============================================================ */
+
+        #game-canvas {
+            position: absolute;
+
+            top: 0;
+            left: 0;
+
+            width: 100%;
+            height: 100%;
+
+            z-index: 10;
+        }
+
+        /* ============================================================
+           JOGADOR
+           ============================================================ */
+
+        .player {
+            position: absolute;
+
+            width: 55px;
+            height: 80px;
+
+            z-index: 30;
+
+            pointer-events: none;
+        }
+
+        .player-body {
+            position: absolute;
+
+            left: 16px;
+            top: 25px;
+
+            width: 25px;
+            height: 38px;
+
+            background:
+                linear-gradient(
+                    to right,
+                    #1d3e5c,
+                    #3479a8,
+                    #1d3e5c
+                );
+
+            border:
+                2px solid #050505;
+
+            border-radius:
+                5px 5px 3px 3px;
+
+            box-shadow:
+                0 4px 5px
+                rgba(0, 0, 0, 0.7);
+        }
+
+        .player-head {
+            position: absolute;
+
+            left: 18px;
+            top: 5px;
+
+            width: 22px;
+            height: 22px;
+
+            background: #d99b6b;
+
+            border:
+                2px solid #111;
+
+            border-radius: 50%;
+
+            z-index: 2;
+        }
+
+        /* ============================================================
+           ARMAS
+           ============================================================ */
+
+        .weapon {
+            position: absolute;
+
+            top: 31px;
+            left: 31px;
+
+            object-fit: contain;
+            object-position: center;
+
+            transform-origin: 8px 50%;
+
+            z-index: 40;
+
+            pointer-events: none;
+
+            filter:
+                drop-shadow(
+                    0 2px 3px
+                    rgba(0, 0, 0, 0.9)
+                );
+        }
+
+        .pistol-held {
+            width: 60px;
+            height: 35px;
+        }
+
+        .ak47-held {
+            width: 100px;
+            height: 45px;
+        }
+
+        /* ============================================================
+           ZUMBIS
+           ============================================================ */
+
+        .zombie {
+            position: absolute;
+
+            width: 55px;
+            height: 75px;
+
+            object-fit: contain;
+            object-position: center;
+
+            z-index: 20;
+
+            pointer-events: none;
+
+            filter:
+                drop-shadow(
+                    0 4px 5px
+                    rgba(0, 0, 0, 0.85)
+                );
+        }
+
+        /* ============================================================
+           CHEFE
+           ============================================================ */
+
+        .boss-zombie {
+            position: absolute;
+
+            width: 130px;
+            height: 200px;
+
+            object-fit: contain;
+            object-position: center;
+
+            z-index: 25;
+
+            pointer-events: none;
+
+            filter:
+                drop-shadow(
+                    0 0 15px
+                    rgba(255, 0, 0, 0.65)
+                )
+                drop-shadow(
+                    0 8px 8px
+                    rgba(0, 0, 0, 0.9)
+                );
+        }
+
+        /* ============================================================
+           BALAS
+           ============================================================ */
+
+        .bullet {
+            position: absolute;
+
+            width: 10px;
+            height: 5px;
+
+            background:
+                linear-gradient(
+                    to right,
+                    #fff,
+                    #ffe600,
+                    #ff6600
+                );
+
+            border-radius: 5px;
+
+            box-shadow:
+                0 0 7px #ffe600;
+
+            z-index: 50;
+
+            pointer-events: none;
+        }
+
+        /* ============================================================
+           PEDRA DO CHEFE
+           ============================================================ */
+
+        .rock-projectile {
+            position: absolute;
+
+            width: 45px;
+            height: 45px;
+
+            background:
+                radial-gradient(
+                    circle at 30% 25%,
+                    #999,
+                    #555 45%,
+                    #222
+                );
+
+            border:
+                3px solid #151515;
+
+            border-radius: 30%;
+
+            z-index: 45;
+
+            box-shadow:
+                0 0 10px
+                rgba(0, 0, 0, 0.8);
+
+            animation:
+                spinRock
+                0.6s linear infinite;
+        }
+
+        @keyframes spinRock {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ============================================================
+           CONTROLES
+           ============================================================ */
+
+        #controls-hint {
+            position: absolute;
+
+            bottom: 12px;
+            left: 50%;
+
+            transform: translateX(-50%);
+
+            background:
+                rgba(0, 0, 0, 0.75);
+
+            padding: 8px 18px;
+
+            border-radius: 20px;
+
+            font-size: 13px;
+            color: #ddd;
+
+            z-index: 100;
+
+            border:
+                1px solid #444;
+
+            box-shadow:
+                0 2px 10px
+                rgba(0, 0, 0, 0.6);
+        }
+
+        /* ============================================================
+           MODAIS
+           ============================================================ */
+
+        .modal {
+            position: absolute;
+
+            top: 50%;
+            left: 50%;
+
+            transform:
+                translate(-50%, -50%);
+
+            min-width: 350px;
+
+            background:
+                rgba(10, 10, 15, 0.96);
+
+            padding: 35px 50px;
+
+            border:
+                2px solid #ff4444;
+
+            box-shadow:
+                0 0 40px
+                rgba(0, 0, 0, 0.9);
+
+            text-align: center;
+
+            z-index: 200;
+
+            border-radius: 10px;
+        }
+
+        .modal h2 {
+            font-size: 34px;
+
+            margin-bottom: 15px;
+
+            color: #ff4444;
+
+            text-shadow:
+                0 0 10px
+                rgba(255, 0, 0, 0.5);
+        }
+
+        .modal p {
+            margin-bottom: 22px;
+
+            font-size: 18px;
+
+            color: #ddd;
+        }
+
+        .modal button {
+            padding: 11px 28px;
+
+            font-size: 16px;
+            font-weight: bold;
+
+            background: #d50000;
+
+            color: white;
+
+            border: none;
+
+            border-radius: 5px;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+        }
+
+        .modal button:hover {
+            background: #ff2222;
+            transform: scale(1.05);
+        }
+
+        /* ============================================================
+           OCULTO
+           ============================================================ */
+
+        .hidden {
+            display: none;
+        }
+
+        /* ============================================================
+           RESPONSIVO
+           ============================================================ */
+
+        @media (max-width: 800px) {
+
+            #hud {
+                padding: 8px 10px;
+                gap: 8px;
+
+                font-size: 11px;
+
+                flex-wrap: wrap;
+            }
+
+            #health-bar-container {
+                width: 100px;
+                height: 16px;
+            }
+
+            #controls-hint {
+                font-size: 10px;
+
+                width: 95%;
+
+                text-align: center;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
     <div id="game-container">
 
-        <!-- FUNDO DO JOGO -->
+        <!-- FUNDO -->
         <div class="background" id="game-background">
             <div class="background-overlay"></div>
         </div>
@@ -20,31 +566,45 @@
         <div id="hud">
 
             <div class="hud-item health-item">
-                <span class="hud-label">VIDA:</span>
+
+                <span class="hud-label">
+                    VIDA:
+                </span>
 
                 <div id="health-bar-container">
+
                     <div id="health-bar"></div>
+
                 </div>
+
             </div>
 
             <div class="hud-item">
                 ARMA:
-                <span id="current-weapon">Pistola</span>
+                <span id="current-weapon">
+                    Pistola
+                </span>
             </div>
 
             <div class="hud-item">
                 FASE:
-                <span id="current-level">1/5</span>
+                <span id="current-level">
+                    1/5
+                </span>
             </div>
 
             <div class="hud-item">
                 PONTOS:
-                <span id="current-score">0</span>
+                <span id="current-score">
+                    0
+                </span>
             </div>
 
             <div class="hud-item">
                 MUNIÇÃO:
-                <span id="current-ammo">12/60</span>
+                <span id="current-ammo">
+                    12/60
+                </span>
             </div>
 
         </div>
@@ -54,11 +614,13 @@
 
         <!-- CONTROLES -->
         <div id="controls-hint">
+
             [WASD] Mover |
             [Mouse] Mirar/Atirar |
             [Q] Trocar Arma |
             [R] Recarregar |
             [P] Pausar
+
         </div>
 
     </div>
@@ -66,10 +628,13 @@
     <!-- PAUSA -->
     <div id="pause-modal" class="modal hidden">
 
-        <h2>JOGO PAUSADO</h2>
+        <h2>
+            JOGO PAUSADO
+        </h2>
 
         <p>
-            Pressione <strong>[P]</strong> para continuar
+            Pressione <strong>[P]</strong>
+            para continuar
         </p>
 
     </div>
@@ -77,7 +642,9 @@
     <!-- GAME OVER -->
     <div id="game-over-modal" class="modal hidden">
 
-        <h2>FIM DE JOGO!</h2>
+        <h2>
+            FIM DE JOGO!
+        </h2>
 
         <p>
             Você sobreviveu até a Fase:
@@ -93,7 +660,9 @@
     <!-- VITÓRIA -->
     <div id="win-modal" class="modal hidden">
 
-        <h2>VITÓRIA!</h2>
+        <h2>
+            VITÓRIA!
+        </h2>
 
         <p>
             Você destruiu o Chefe Zumbi
@@ -106,7 +675,1737 @@
 
     </div>
 
-    <script src="script.js"></script>
+    <script>
+
+        // ============================================================
+        // APOCALIPSE ZUMBI
+        // ============================================================
+
+        // ------------------------------------------------------------
+        // ELEMENTOS
+        // ------------------------------------------------------------
+
+        const container =
+            document.getElementById('game-container');
+
+        const canvas =
+            document.getElementById('game-canvas');
+
+        const background =
+            document.getElementById('game-background');
+
+        const hud = {
+
+            health:
+                document.getElementById('health-bar'),
+
+            weapon:
+                document.getElementById('current-weapon'),
+
+            level:
+                document.getElementById('current-level'),
+
+            score:
+                document.getElementById('current-score'),
+
+            ammo:
+                document.getElementById('current-ammo')
+
+        };
+
+        const pauseModal =
+            document.getElementById('pause-modal');
+
+        const gameOverModal =
+            document.getElementById('game-over-modal');
+
+        const winModal =
+            document.getElementById('win-modal');
+
+
+        // ------------------------------------------------------------
+        // ESTADO
+        // ------------------------------------------------------------
+
+        let isPaused = false;
+        let gameOver = false;
+        let gameWon = false;
+
+        let gameScore = 0;
+        let currentLevel = 1;
+
+        let backgroundOffset = 0;
+
+
+        // ------------------------------------------------------------
+        // FASES
+        // ------------------------------------------------------------
+
+        const LEVEL_MAPS = [
+
+            {
+                zombies: 6,
+                bgSpeed: 0.5
+            },
+
+            {
+                zombies: 12,
+                bgSpeed: 0.8
+            },
+
+            {
+                zombies: 18,
+                bgSpeed: 1
+            },
+
+            {
+                zombies: 24,
+                bgSpeed: 1.2
+            },
+
+            {
+                zombies: 0,
+                boss: true
+            }
+
+        ];
+
+
+        // ------------------------------------------------------------
+        // ARMAS
+        // ------------------------------------------------------------
+
+        const WEAPONS = {
+
+            Pistola: {
+
+                ammo: 12,
+                maxAmmo: 12,
+                reserveAmmo: 60,
+
+                damage: 25,
+
+                fireRate: 300,
+
+                speed: 14,
+
+                classHeld: 'pistol-held',
+
+                image: './pistola.jpg'
+
+            },
+
+            AK47: {
+
+                ammo: 30,
+                maxAmmo: 30,
+                reserveAmmo: 120,
+
+                damage: 18,
+
+                fireRate: 100,
+
+                speed: 16,
+
+                classHeld: 'ak47-held',
+
+                image: './X6nIEx (1).png'
+
+            }
+
+        };
+
+
+        let currentWeaponName =
+            'Pistola';
+
+        let activeWeapon = {
+            ...WEAPONS[currentWeaponName]
+        };
+
+        let canFire = true;
+        let isReloading = false;
+
+
+        // ------------------------------------------------------------
+        // MOUSE
+        // ------------------------------------------------------------
+
+        let mousePos = {
+            x: 0,
+            y: 0
+        };
+
+
+        // ------------------------------------------------------------
+        // JOGADOR
+        // ------------------------------------------------------------
+
+        let player = {
+
+            x: 120,
+            y: 300,
+
+            width: 55,
+            height: 80,
+
+            speed: 5,
+
+            health: 100,
+
+            element: null,
+            weaponElement: null
+
+        };
+
+
+        // ------------------------------------------------------------
+        // ENTIDADES
+        // ------------------------------------------------------------
+
+        let zombies = [];
+        let bullets = [];
+
+        let boss = null;
+
+        let bossProjectiles = [];
+
+
+        // ------------------------------------------------------------
+        // TECLAS
+        // ------------------------------------------------------------
+
+        const keys = {};
+
+
+        // ============================================================
+        // INICIALIZAÇÃO
+        // ============================================================
+
+        function init() {
+
+            createPlayer();
+
+            loadLevel(currentLevel);
+
+            setupInputs();
+
+            updateHUD();
+
+            requestAnimationFrame(gameLoop);
+
+        }
+
+
+        // ============================================================
+        // CRIAR JOGADOR
+        // ============================================================
+
+        function createPlayer() {
+
+            player.element =
+                document.createElement('div');
+
+            player.element.className =
+                'player';
+
+
+            const body =
+                document.createElement('div');
+
+            body.className =
+                'player-body';
+
+
+            const head =
+                document.createElement('div');
+
+            head.className =
+                'player-head';
+
+
+            player.weaponElement =
+                document.createElement('img');
+
+            player.weaponElement.className =
+                'weapon';
+
+
+            updateWeaponImage();
+
+
+            player.element.appendChild(body);
+
+            player.element.appendChild(head);
+
+            player.element.appendChild(
+                player.weaponElement
+            );
+
+
+            canvas.appendChild(
+                player.element
+            );
+
+        }
+
+
+        // ============================================================
+        // IMAGEM DA ARMA
+        // ============================================================
+
+        function updateWeaponImage() {
+
+            player.weaponElement.src =
+                activeWeapon.image;
+
+            player.weaponElement.alt =
+                currentWeaponName;
+
+            player.weaponElement.className =
+                `weapon ${activeWeapon.classHeld}`;
+
+        }
+
+
+        // ============================================================
+        // CARREGAR FASE
+        // ============================================================
+
+        function loadLevel(level) {
+
+            clearZombies();
+
+            const map =
+                LEVEL_MAPS[level - 1];
+
+
+            if (!map) {
+                return;
+            }
+
+
+            if (map.boss) {
+
+                createBoss();
+
+            } else {
+
+                boss = null;
+
+                for (
+                    let i = 0;
+                    i < map.zombies;
+                    i++
+                ) {
+
+                    spawnZombie();
+
+                }
+
+            }
+
+        }
+
+
+        // ============================================================
+        // CONTROLES
+        // ============================================================
+
+        function setupInputs() {
+
+            window.addEventListener(
+                'keydown',
+                (e) => {
+
+                    const key =
+                        e.key.toLowerCase();
+
+                    keys[key] = true;
+
+
+                    if (e.repeat) {
+
+                        if (
+                            key === 'r' ||
+                            key === 'q' ||
+                            key === 'p'
+                        ) {
+
+                            return;
+
+                        }
+
+                    }
+
+
+                    if (key === 'r') {
+                        reloadWeapon();
+                    }
+
+
+                    if (key === 'q') {
+                        swapWeapon();
+                    }
+
+
+                    if (key === 'p') {
+                        togglePause();
+                    }
+
+                }
+            );
+
+
+            window.addEventListener(
+                'keyup',
+                (e) => {
+
+                    keys[
+                        e.key.toLowerCase()
+                    ] = false;
+
+                }
+            );
+
+
+            window.addEventListener(
+                'mousemove',
+                (e) => {
+
+                    mousePos.x =
+                        e.clientX;
+
+                    mousePos.y =
+                        e.clientY;
+
+                }
+            );
+
+
+            window.addEventListener(
+                'mousedown',
+                (e) => {
+
+                    if (e.button === 0) {
+                        keys.click = true;
+                    }
+
+                }
+            );
+
+
+            window.addEventListener(
+                'mouseup',
+                (e) => {
+
+                    if (e.button === 0) {
+                        keys.click = false;
+                    }
+
+                }
+            );
+
+        }
+
+
+        // ============================================================
+        // LOOP PRINCIPAL
+        // ============================================================
+
+        function gameLoop() {
+
+            if (
+                !isPaused &&
+                !gameOver &&
+                !gameWon
+            ) {
+
+                updatePlayer();
+
+                updateBullets();
+
+                updateZombies();
+
+                if (boss) {
+                    updateBoss();
+                }
+
+                checkCollisions();
+
+                updateBackground();
+
+                updateHUD();
+
+            }
+
+            requestAnimationFrame(gameLoop);
+
+        }
+
+
+        // ============================================================
+        // JOGADOR
+        // ============================================================
+
+        function updatePlayer() {
+
+            let vx = 0;
+            let vy = 0;
+
+
+            if (
+                keys.w ||
+                keys.arrowup
+            ) {
+
+                vy -= 1;
+
+            }
+
+
+            if (
+                keys.s ||
+                keys.arrowdown
+            ) {
+
+                vy += 1;
+
+            }
+
+
+            if (
+                keys.a ||
+                keys.arrowleft
+            ) {
+
+                vx -= 1;
+
+            }
+
+
+            if (
+                keys.d ||
+                keys.arrowright
+            ) {
+
+                vx += 1;
+
+            }
+
+
+            if (
+                vx !== 0 &&
+                vy !== 0
+            ) {
+
+                vx *= 0.7071;
+                vy *= 0.7071;
+
+            }
+
+
+            player.x =
+                Math.max(
+                    0,
+                    Math.min(
+                        container.offsetWidth -
+                        player.width,
+
+                        player.x +
+                        vx *
+                        player.speed
+                    )
+                );
+
+
+            player.y =
+                Math.max(
+                    80,
+                    Math.min(
+                        container.offsetHeight -
+                        player.height,
+
+                        player.y +
+                        vy *
+                        player.speed
+                    )
+                );
+
+
+            player.element.style.left =
+                `${player.x}px`;
+
+            player.element.style.top =
+                `${player.y}px`;
+
+
+            // --------------------------------------------------------
+            // MIRA
+            // --------------------------------------------------------
+
+            const rect =
+                container.getBoundingClientRect();
+
+
+            const mouseX =
+                mousePos.x -
+                rect.left;
+
+            const mouseY =
+                mousePos.y -
+                rect.top;
+
+
+            const playerCenterX =
+                player.x +
+                player.width / 2;
+
+            const playerCenterY =
+                player.y +
+                player.height / 2;
+
+
+            const angle =
+                Math.atan2(
+                    mouseY -
+                    playerCenterY,
+
+                    mouseX -
+                    playerCenterX
+                );
+
+
+            player.weaponElement.style.transform =
+                `rotate(${angle}rad)`;
+
+
+            // --------------------------------------------------------
+            // TIRO
+            // --------------------------------------------------------
+
+            if (
+                keys.click &&
+                canFire &&
+                !isReloading
+            ) {
+
+                fireBullet(angle);
+
+            }
+
+        }
+
+
+        // ============================================================
+        // ATIRAR
+        // ============================================================
+
+        function fireBullet(angle) {
+
+            if (
+                activeWeapon.ammo <= 0
+            ) {
+
+                reloadWeapon();
+
+                return;
+
+            }
+
+
+            canFire = false;
+
+            activeWeapon.ammo--;
+
+
+            const bulletEl =
+                document.createElement('div');
+
+            bulletEl.className =
+                'bullet';
+
+
+            canvas.appendChild(
+                bulletEl
+            );
+
+
+            const startX =
+                player.x +
+                player.width / 2 +
+                Math.cos(angle) *
+                35;
+
+
+            const startY =
+                player.y +
+                player.height / 2 +
+                Math.sin(angle) *
+                20;
+
+
+            bullets.push({
+
+                x: startX,
+                y: startY,
+
+                vx:
+                    Math.cos(angle) *
+                    activeWeapon.speed,
+
+                vy:
+                    Math.sin(angle) *
+                    activeWeapon.speed,
+
+                damage:
+                    activeWeapon.damage,
+
+                element:
+                    bulletEl
+
+            });
+
+
+            setTimeout(
+                () => {
+
+                    canFire = true;
+
+                },
+
+                activeWeapon.fireRate
+            );
+
+        }
+
+
+        // ============================================================
+        // PROJÉTEIS
+        // ============================================================
+
+        function updateBullets() {
+
+            bullets.forEach(
+                (b, index) => {
+
+                    b.x += b.vx;
+                    b.y += b.vy;
+
+
+                    b.element.style.left =
+                        `${b.x}px`;
+
+                    b.element.style.top =
+                        `${b.y}px`;
+
+
+                    if (
+                        b.x < -50 ||
+                        b.x >
+                        container.offsetWidth +
+                        50 ||
+
+                        b.y < -50 ||
+                        b.y >
+                        container.offsetHeight +
+                        50
+                    ) {
+
+                        b.element.remove();
+
+                        bullets.splice(
+                            index,
+                            1
+                        );
+
+                    }
+
+                }
+            );
+
+
+            bossProjectiles.forEach(
+                (p, index) => {
+
+                    p.x += p.vx;
+                    p.y += p.vy;
+
+
+                    p.element.style.left =
+                        `${p.x}px`;
+
+                    p.element.style.top =
+                        `${p.y}px`;
+
+
+                    if (
+                        p.x < -100 ||
+                        p.x >
+                        container.offsetWidth +
+                        100 ||
+
+                        p.y < -100 ||
+                        p.y >
+                        container.offsetHeight +
+                        100
+                    ) {
+
+                        p.element.remove();
+
+                        bossProjectiles.splice(
+                            index,
+                            1
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        // ============================================================
+        // CRIAR ZUMBI
+        // ============================================================
+
+        function spawnZombie() {
+
+            const zEl =
+                document.createElement('img');
+
+
+            zEl.className =
+                'zombie';
+
+            zEl.src =
+                './zumbi.webp';
+
+            zEl.alt =
+                'Zumbi';
+
+
+            canvas.appendChild(
+                zEl
+            );
+
+
+            const spawnX =
+                container.offsetWidth +
+                50 +
+                Math.random() *
+                300;
+
+
+            const spawnY =
+                100 +
+                Math.random() *
+                Math.max(
+                    100,
+                    container.offsetHeight -
+                    200
+                );
+
+
+            zombies.push({
+
+                x: spawnX,
+                y: spawnY,
+
+                width: 55,
+                height: 75,
+
+                health: 50,
+
+                speed:
+                    0.8 +
+                    Math.random() *
+                    1.2,
+
+                element: zEl
+
+            });
+
+        }
+
+
+        // ============================================================
+        // ATUALIZAR ZUMBIS
+        // ============================================================
+
+        function updateZombies() {
+
+            zombies.forEach(
+                (z) => {
+
+                    const dx =
+                        player.x -
+                        z.x;
+
+                    const dy =
+                        player.y -
+                        z.y;
+
+
+                    const dist =
+                        Math.hypot(
+                            dx,
+                            dy
+                        );
+
+
+                    if (dist > 0) {
+
+                        z.x +=
+                            (dx / dist) *
+                            z.speed;
+
+                        z.y +=
+                            (dy / dist) *
+                            z.speed;
+
+                    }
+
+
+                    z.element.style.left =
+                        `${z.x}px`;
+
+                    z.element.style.top =
+                        `${z.y}px`;
+
+
+                    if (
+                        checkRectCollision(
+                            player,
+                            z
+                        )
+                    ) {
+
+                        takeDamage(
+                            0.15
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        // ============================================================
+        // LIMPAR ZUMBIS
+        // ============================================================
+
+        function clearZombies() {
+
+            zombies.forEach(
+                (z) => {
+
+                    z.element.remove();
+
+                }
+            );
+
+
+            zombies = [];
+
+
+            bossProjectiles.forEach(
+                (p) => {
+
+                    p.element.remove();
+
+                }
+            );
+
+
+            bossProjectiles = [];
+
+        }
+
+
+        // ============================================================
+        // CRIAR CHEFE
+        // ============================================================
+
+        function createBoss() {
+
+            const bEl =
+                document.createElement('img');
+
+
+            bEl.className =
+                'boss-zombie';
+
+
+            bEl.src =
+                './otiQd2.png';
+
+
+            bEl.alt =
+                'Chefe Zumbi';
+
+
+            canvas.appendChild(
+                bEl
+            );
+
+
+            boss = {
+
+                x:
+                    container.offsetWidth -
+                    180,
+
+                y:
+                    container.offsetHeight /
+                    2 -
+                    100,
+
+                width: 130,
+                height: 200,
+
+                health: 1500,
+                maxHealth: 1500,
+
+                element: bEl,
+
+                lastAbilityTime:
+                    Date.now(),
+
+                abilityCooldown:
+                    2500
+
+            };
+
+        }
+
+
+        // ============================================================
+        // ATUALIZAR CHEFE
+        // ============================================================
+
+        function updateBoss() {
+
+            if (!boss) {
+                return;
+            }
+
+
+            const baseY =
+                container.offsetHeight /
+                2 -
+                100;
+
+
+            boss.y =
+                baseY +
+                Math.sin(
+                    Date.now() /
+                    800
+                ) *
+                70;
+
+
+            boss.element.style.left =
+                `${boss.x}px`;
+
+            boss.element.style.top =
+                `${boss.y}px`;
+
+
+            const now =
+                Date.now();
+
+
+            if (
+                now -
+                boss.lastAbilityTime >
+                boss.abilityCooldown
+            ) {
+
+                if (
+                    Math.random() <
+                    0.5
+                ) {
+
+                    bossAbilitySummon();
+
+                } else {
+
+                    bossAbilityThrowRock();
+
+                }
+
+
+                boss.lastAbilityTime =
+                    now;
+
+            }
+
+        }
+
+
+        // ============================================================
+        // CHEFE - INVOCAR
+        // ============================================================
+
+        function bossAbilitySummon() {
+
+            for (
+                let i = 0;
+                i < 3;
+                i++
+            ) {
+
+                spawnZombie();
+
+            }
+
+        }
+
+
+        // ============================================================
+        // CHEFE - PEDRA
+        // ============================================================
+
+        function bossAbilityThrowRock() {
+
+            if (!boss) {
+                return;
+            }
+
+
+            const rockEl =
+                document.createElement('div');
+
+
+            rockEl.className =
+                'rock-projectile';
+
+
+            canvas.appendChild(
+                rockEl
+            );
+
+
+            const startX =
+                boss.x;
+
+
+            const startY =
+                boss.y +
+                boss.height / 2;
+
+
+            const angle =
+                Math.atan2(
+                    player.y -
+                    startY,
+
+                    player.x -
+                    startX
+                );
+
+
+            bossProjectiles.push({
+
+                x: startX,
+                y: startY,
+
+                width: 45,
+                height: 45,
+
+                vx:
+                    Math.cos(angle) * 7,
+
+                vy:
+                    Math.sin(angle) * 7,
+
+                damage: 25,
+
+                element:
+                    rockEl
+
+            });
+
+        }
+
+
+        // ============================================================
+        // COLISÕES
+        // ============================================================
+
+        function checkCollisions() {
+
+            // --------------------------------------------------------
+            // BALAS -> ZUMBIS
+            // --------------------------------------------------------
+
+            for (
+                let bIdx =
+                    bullets.length - 1;
+
+                bIdx >= 0;
+
+                bIdx--
+            ) {
+
+                const b =
+                    bullets[bIdx];
+
+                let bulletRemoved =
+                    false;
+
+
+                for (
+                    let zIdx =
+                        zombies.length - 1;
+
+                    zIdx >= 0;
+
+                    zIdx--
+                ) {
+
+                    const z =
+                        zombies[zIdx];
+
+
+                    if (
+                        checkPointRectCollision(
+                            b,
+                            z
+                        )
+                    ) {
+
+                        z.health -=
+                            b.damage;
+
+
+                        b.element.remove();
+
+                        bullets.splice(
+                            bIdx,
+                            1
+                        );
+
+
+                        bulletRemoved =
+                            true;
+
+
+                        if (
+                            z.health <= 0
+                        ) {
+
+                            z.element.remove();
+
+                            zombies.splice(
+                                zIdx,
+                                1
+                            );
+
+
+                            gameScore += 20;
+
+                            checkLevelProgress();
+
+                        }
+
+
+                        break;
+
+                    }
+
+                }
+
+
+                if (bulletRemoved) {
+                    continue;
+                }
+
+
+                // ----------------------------------------------------
+                // BALAS -> CHEFE
+                // ----------------------------------------------------
+
+                if (
+                    boss &&
+                    checkPointRectCollision(
+                        b,
+                        boss
+                    )
+                ) {
+
+                    boss.health -=
+                        b.damage;
+
+
+                    b.element.remove();
+
+                    bullets.splice(
+                        bIdx,
+                        1
+                    );
+
+
+                    if (
+                        boss.health <= 0
+                    ) {
+
+                        defeatBoss();
+
+                    }
+
+                }
+
+            }
+
+
+            // --------------------------------------------------------
+            // PEDRAS -> JOGADOR
+            // --------------------------------------------------------
+
+            for (
+                let pIdx =
+                    bossProjectiles.length - 1;
+
+                pIdx >= 0;
+
+                pIdx--
+            ) {
+
+                const p =
+                    bossProjectiles[pIdx];
+
+
+                if (
+                    checkRectCollision(
+                        p,
+                        player
+                    )
+                ) {
+
+                    takeDamage(
+                        p.damage
+                    );
+
+
+                    p.element.remove();
+
+                    bossProjectiles.splice(
+                        pIdx,
+                        1
+                    );
+
+                }
+
+            }
+
+        }
+
+
+        // ============================================================
+        // PROGRESSÃO
+        // ============================================================
+
+        function checkLevelProgress() {
+
+            if (boss) {
+                return;
+            }
+
+
+            if (
+                zombies.length === 0 &&
+                currentLevel < 5
+            ) {
+
+                currentLevel++;
+
+                loadLevel(
+                    currentLevel
+                );
+
+            }
+
+        }
+
+
+        // ============================================================
+        // DERROTAR CHEFE
+        // ============================================================
+
+        function defeatBoss() {
+
+            if (!boss) {
+                return;
+            }
+
+
+            gameWon = true;
+
+
+            boss.element.remove();
+
+            boss = null;
+
+
+            winModal.classList.remove(
+                'hidden'
+            );
+
+        }
+
+
+        // ============================================================
+        // DANO
+        // ============================================================
+
+        function takeDamage(amount) {
+
+            if (
+                gameOver ||
+                gameWon
+            ) {
+
+                return;
+
+            }
+
+
+            player.health -=
+                amount;
+
+
+            player.health =
+                Math.max(
+                    0,
+                    player.health
+                );
+
+
+            if (
+                player.health <= 0
+            ) {
+
+                gameOver = true;
+
+
+                document.getElementById(
+                    'final-level'
+                ).innerText =
+                    currentLevel;
+
+
+                gameOverModal.classList.remove(
+                    'hidden'
+                );
+
+            }
+
+        }
+
+
+        // ============================================================
+        // FUNDO PARALLAX
+        // ============================================================
+
+        function updateBackground() {
+
+            const map =
+                LEVEL_MAPS[
+                    currentLevel - 1
+                ];
+
+
+            if (
+                !map ||
+                map.boss
+            ) {
+
+                return;
+
+            }
+
+
+            backgroundOffset -=
+                map.bgSpeed;
+
+
+            if (
+                backgroundOffset <
+                -container.offsetWidth
+            ) {
+
+                backgroundOffset = 0;
+
+            }
+
+
+            background.style.transform =
+                `translateX(${backgroundOffset}px)`;
+
+        }
+
+
+        // ============================================================
+        // TROCAR ARMA
+        // ============================================================
+
+        function swapWeapon() {
+
+            if (isReloading) {
+                return;
+            }
+
+
+            currentWeaponName =
+                currentWeaponName === 'Pistola'
+                    ? 'AK47'
+                    : 'Pistola';
+
+
+            activeWeapon = {
+                ...WEAPONS[
+                    currentWeaponName
+                ]
+            };
+
+
+            updateWeaponImage();
+
+            updateHUD();
+
+        }
+
+
+        // ============================================================
+        // RECARREGAR
+        // ============================================================
+
+        function reloadWeapon() {
+
+            if (isReloading) {
+                return;
+            }
+
+
+            if (
+                activeWeapon.ammo ===
+                activeWeapon.maxAmmo
+            ) {
+
+                return;
+
+            }
+
+
+            if (
+                activeWeapon.reserveAmmo <= 0
+            ) {
+
+                return;
+
+            }
+
+
+            isReloading = true;
+
+            updateHUD();
+
+
+            const reloadTime =
+                currentWeaponName === 'AK47'
+                    ? 1400
+                    : 900;
+
+
+            setTimeout(
+                () => {
+
+                    const needed =
+                        activeWeapon.maxAmmo -
+                        activeWeapon.ammo;
+
+
+                    const amount =
+                        Math.min(
+                            needed,
+                            activeWeapon.reserveAmmo
+                        );
+
+
+                    activeWeapon.ammo +=
+                        amount;
+
+
+                    activeWeapon.reserveAmmo -=
+                        amount;
+
+
+                    isReloading = false;
+
+                    updateHUD();
+
+                },
+
+                reloadTime
+            );
+
+        }
+
+
+        // ============================================================
+        // COLISÃO RETÂNGULO
+        // ============================================================
+
+        function checkRectCollision(r1, r2) {
+
+            return (
+
+                r1.x <
+                r2.x +
+                r2.width
+
+                &&
+
+                r1.x +
+                r1.width >
+                r2.x
+
+                &&
+
+                r1.y <
+                r2.y +
+                r2.height
+
+                &&
+
+                r1.y +
+                r1.height >
+                r2.y
+
+            );
+
+        }
+
+
+        // ============================================================
+        // COLISÃO PONTO
+        // ============================================================
+
+        function checkPointRectCollision(pt, r) {
+
+            return (
+
+                pt.x >= r.x &&
+
+                pt.x <=
+                r.x +
+                r.width &&
+
+                pt.y >= r.y &&
+
+                pt.y <=
+                r.y +
+                r.height
+
+            );
+
+        }
+
+
+        // ============================================================
+        // HUD
+        // ============================================================
+
+        function updateHUD() {
+
+            hud.health.style.width =
+                `${Math.max(
+                    0,
+                    player.health
+                )}%`;
+
+
+            hud.weapon.innerText =
+                isReloading
+                    ? 'Recarregando...'
+                    : currentWeaponName;
+
+
+            const map =
+                LEVEL_MAPS[
+                    currentLevel - 1
+                ];
+
+
+            hud.level.innerText =
+                `${currentLevel}/5${
+                    map && map.boss
+                        ? ' (CHEFE)'
+                        : ''
+                }`;
+
+
+            hud.score.innerText =
+                gameScore;
+
+
+            hud.ammo.innerText =
+                `${activeWeapon.ammo}/${activeWeapon.reserveAmmo}`;
+
+        }
+
+
+        // ============================================================
+        // PAUSA
+        // ============================================================
+
+        function togglePause() {
+
+            if (
+                gameOver ||
+                gameWon
+            ) {
+
+                return;
+
+            }
+
+
+            isPaused =
+                !isPaused;
+
+
+            pauseModal.classList.toggle(
+                'hidden'
+            );
+
+        }
+
+
+        // ============================================================
+        // REINICIAR
+        // ============================================================
+
+        function restartGame() {
+
+            location.reload();
+
+        }
+
+
+        // ============================================================
+        // INICIAR
+        // ============================================================
+
+        init();
+
+    </script>
 
 </body>
 </html>
