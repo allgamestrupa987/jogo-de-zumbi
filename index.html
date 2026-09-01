@@ -218,65 +218,36 @@
 
 
         /* ============================================================
-           JOGADOR
+           NOVO PERSONAGEM
            ============================================================ */
 
         .player {
             position: absolute;
 
-            width: 55px;
-            height: 80px;
+            width: 70px;
+            height: 90px;
 
             z-index: 30;
 
             pointer-events: none;
-        }
 
-        .player-body {
-            position: absolute;
+            background-image:
+                url("./image.png");
 
-            left: 16px;
-            top: 25px;
+            background-size:
+                contain;
 
-            width: 25px;
-            height: 38px;
+            background-position:
+                center;
 
-            background:
-                linear-gradient(
-                    to right,
-                    #1d3e5c,
-                    #3479a8,
-                    #1d3e5c
+            background-repeat:
+                no-repeat;
+
+            filter:
+                drop-shadow(
+                    0 4px 5px
+                    rgba(0, 0, 0, 0.7)
                 );
-
-            border:
-                2px solid #050505;
-
-            border-radius:
-                5px 5px 3px 3px;
-
-            box-shadow:
-                0 4px 5px
-                rgba(0, 0, 0, 0.7);
-        }
-
-        .player-head {
-            position: absolute;
-
-            left: 18px;
-            top: 5px;
-
-            width: 22px;
-            height: 22px;
-
-            background: #d99b6b;
-
-            border:
-                2px solid #111;
-
-            border-radius: 50%;
-
-            z-index: 2;
         }
 
 
@@ -639,6 +610,11 @@
                     center;
             }
 
+            .player {
+                width: 60px;
+                height: 80px;
+            }
+
         }
 
     </style>
@@ -964,7 +940,6 @@
 
         const WEAPONS = {
 
-
             Pistola: {
 
                 ammo: 12,
@@ -1054,9 +1029,9 @@
 
             y: 300,
 
-            width: 55,
+            width: 70,
 
-            height: 80,
+            height: 90,
 
             speed: 5,
 
@@ -1127,24 +1102,6 @@
                 'player';
 
 
-            const body =
-                document.createElement(
-                    'div'
-                );
-
-            body.className =
-                'player-body';
-
-
-            const head =
-                document.createElement(
-                    'div'
-                );
-
-            head.className =
-                'player-head';
-
-
             player.weaponElement =
                 document.createElement(
                     'img'
@@ -1157,14 +1114,6 @@
 
             updateWeaponImage();
 
-
-            player.element.appendChild(
-                body
-            );
-
-            player.element.appendChild(
-                head
-            );
 
             player.element.appendChild(
                 player.weaponElement
