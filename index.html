@@ -1,12 +1,21 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Apocalipse Zumbi: Sobrevivente</title>
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Apocalipse Zumbi: Sobrevivente
+    </title>
 
     <style>
+
         /* ============================================================
            CONFIGURAÇÃO GERAL
            ============================================================ */
@@ -21,6 +30,7 @@
         body {
             width: 100%;
             height: 100%;
+
             overflow: hidden;
 
             font-family:
@@ -35,8 +45,9 @@
             background: #000;
         }
 
+
         /* ============================================================
-           CONTAINER DO JOGO
+           CONTAINER
            ============================================================ */
 
         #game-container {
@@ -44,10 +55,12 @@
             height: 100vh;
 
             position: relative;
+
             overflow: hidden;
 
             cursor: crosshair;
         }
+
 
         /* ============================================================
            FUNDO
@@ -68,14 +81,19 @@
                 url("./cenario.png");
 
             background-size: cover;
-            background-position: center center;
-            background-repeat: repeat-x;
+
+            background-position:
+                center center;
+
+            background-repeat:
+                repeat-x;
 
             will-change: transform;
         }
 
         .background-overlay {
             position: absolute;
+
             inset: 0;
 
             background:
@@ -86,6 +104,7 @@
 
             pointer-events: none;
         }
+
 
         /* ============================================================
            HUD
@@ -105,18 +124,24 @@
             z-index: 100;
 
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+
+            justify-content:
+                space-between;
+
+            align-items:
+                center;
 
             gap: 20px;
 
-            background: rgba(0, 0, 0, 0.75);
+            background:
+                rgba(0, 0, 0, 0.75);
 
             border-bottom:
                 2px solid
                 rgba(255, 255, 255, 0.2);
 
             font-weight: bold;
+
             letter-spacing: 1px;
 
             text-shadow:
@@ -125,14 +150,18 @@
 
         .hud-item {
             display: flex;
+
             align-items: center;
+
             gap: 8px;
+
             white-space: nowrap;
         }
 
         .hud-label {
             color: #ff4444;
         }
+
 
         /* ============================================================
            VIDA
@@ -145,10 +174,10 @@
             background: #171717;
 
             border:
-                2px solid
-                #888;
+                2px solid #888;
 
             border-radius: 4px;
+
             overflow: hidden;
 
             box-shadow:
@@ -170,6 +199,7 @@
                 width 0.1s linear;
         }
 
+
         /* ============================================================
            ÁREA DO JOGO
            ============================================================ */
@@ -185,6 +215,7 @@
 
             z-index: 10;
         }
+
 
         /* ============================================================
            JOGADOR
@@ -248,6 +279,7 @@
             z-index: 2;
         }
 
+
         /* ============================================================
            ARMAS
            ============================================================ */
@@ -259,9 +291,11 @@
             left: 31px;
 
             object-fit: contain;
+
             object-position: center;
 
-            transform-origin: 8px 50%;
+            transform-origin:
+                8px 50%;
 
             z-index: 40;
 
@@ -284,6 +318,7 @@
             height: 45px;
         }
 
+
         /* ============================================================
            ZUMBIS
            ============================================================ */
@@ -295,6 +330,7 @@
             height: 75px;
 
             object-fit: contain;
+
             object-position: center;
 
             z-index: 20;
@@ -308,6 +344,7 @@
                 );
         }
 
+
         /* ============================================================
            CHEFE
            ============================================================ */
@@ -319,6 +356,7 @@
             height: 200px;
 
             object-fit: contain;
+
             object-position: center;
 
             z-index: 25;
@@ -335,6 +373,7 @@
                     rgba(0, 0, 0, 0.9)
                 );
         }
+
 
         /* ============================================================
            BALAS
@@ -363,6 +402,7 @@
 
             pointer-events: none;
         }
+
 
         /* ============================================================
            PEDRA DO CHEFE
@@ -399,10 +439,14 @@
         }
 
         @keyframes spinRock {
+
             100% {
-                transform: rotate(360deg);
+                transform:
+                    rotate(360deg);
             }
+
         }
+
 
         /* ============================================================
            CONTROLES
@@ -414,19 +458,26 @@
             bottom: 12px;
             left: 50%;
 
-            transform: translateX(-50%);
+            transform:
+                translateX(-50%);
 
             background:
                 rgba(0, 0, 0, 0.75);
 
-            padding: 8px 18px;
+            padding:
+                8px 18px;
 
-            border-radius: 20px;
+            border-radius:
+                20px;
 
-            font-size: 13px;
-            color: #ddd;
+            font-size:
+                13px;
 
-            z-index: 100;
+            color:
+                #ddd;
+
+            z-index:
+                100;
 
             border:
                 1px solid #444;
@@ -435,6 +486,7 @@
                 0 2px 10px
                 rgba(0, 0, 0, 0.6);
         }
+
 
         /* ============================================================
            MODAIS
@@ -449,12 +501,14 @@
             transform:
                 translate(-50%, -50%);
 
-            min-width: 350px;
+            min-width:
+                350px;
 
             background:
                 rgba(10, 10, 15, 0.96);
 
-            padding: 35px 50px;
+            padding:
+                35px 50px;
 
             border:
                 2px solid #ff4444;
@@ -463,19 +517,25 @@
                 0 0 40px
                 rgba(0, 0, 0, 0.9);
 
-            text-align: center;
+            text-align:
+                center;
 
-            z-index: 200;
+            z-index:
+                200;
 
-            border-radius: 10px;
+            border-radius:
+                10px;
         }
 
         .modal h2 {
-            font-size: 34px;
+            font-size:
+                34px;
 
-            margin-bottom: 15px;
+            margin-bottom:
+                15px;
 
-            color: #ff4444;
+            color:
+                #ff4444;
 
             text-shadow:
                 0 0 10px
@@ -483,36 +543,53 @@
         }
 
         .modal p {
-            margin-bottom: 22px;
+            margin-bottom:
+                22px;
 
-            font-size: 18px;
+            font-size:
+                18px;
 
-            color: #ddd;
+            color:
+                #ddd;
         }
 
         .modal button {
-            padding: 11px 28px;
+            padding:
+                11px 28px;
 
-            font-size: 16px;
-            font-weight: bold;
+            font-size:
+                16px;
 
-            background: #d50000;
+            font-weight:
+                bold;
 
-            color: white;
+            background:
+                #d50000;
 
-            border: none;
+            color:
+                white;
 
-            border-radius: 5px;
+            border:
+                none;
 
-            cursor: pointer;
+            border-radius:
+                5px;
 
-            transition: 0.2s;
+            cursor:
+                pointer;
+
+            transition:
+                0.2s;
         }
 
         .modal button:hover {
-            background: #ff2222;
-            transform: scale(1.05);
+            background:
+                #ff2222;
+
+            transform:
+                scale(1.05);
         }
+
 
         /* ============================================================
            OCULTO
@@ -522,6 +599,7 @@
             display: none;
         }
 
+
         /* ============================================================
            RESPONSIVO
            ============================================================ */
@@ -529,41 +607,73 @@
         @media (max-width: 800px) {
 
             #hud {
-                padding: 8px 10px;
-                gap: 8px;
+                padding:
+                    8px 10px;
 
-                font-size: 11px;
+                gap:
+                    8px;
 
-                flex-wrap: wrap;
+                font-size:
+                    11px;
+
+                flex-wrap:
+                    wrap;
             }
 
             #health-bar-container {
-                width: 100px;
-                height: 16px;
+                width:
+                    100px;
+
+                height:
+                    16px;
             }
 
             #controls-hint {
-                font-size: 10px;
+                font-size:
+                    10px;
 
-                width: 95%;
+                width:
+                    95%;
 
-                text-align: center;
+                text-align:
+                    center;
             }
+
         }
+
     </style>
+
 </head>
+
 
 <body>
 
+
+    <!-- ============================================================
+         JOGO
+         ============================================================ -->
+
     <div id="game-container">
 
+
         <!-- FUNDO -->
-        <div class="background" id="game-background">
-            <div class="background-overlay"></div>
+
+        <div
+            class="background"
+            id="game-background"
+        >
+
+            <div
+                class="background-overlay"
+            ></div>
+
         </div>
 
+
         <!-- HUD -->
+
         <div id="hud">
+
 
             <div class="hud-item health-item">
 
@@ -579,40 +689,61 @@
 
             </div>
 
+
             <div class="hud-item">
+
                 ARMA:
+
                 <span id="current-weapon">
                     Pistola
                 </span>
+
             </div>
 
+
             <div class="hud-item">
+
                 FASE:
+
                 <span id="current-level">
                     1/5
                 </span>
+
             </div>
 
+
             <div class="hud-item">
+
                 PONTOS:
+
                 <span id="current-score">
                     0
                 </span>
+
             </div>
 
+
             <div class="hud-item">
+
                 MUNIÇÃO:
+
                 <span id="current-ammo">
                     12/60
                 </span>
+
             </div>
+
 
         </div>
 
+
         <!-- ÁREA DO JOGO -->
+
         <div id="game-canvas"></div>
 
+
         <!-- CONTROLES -->
+
         <div id="controls-hint">
 
             [WASD] Mover |
@@ -623,123 +754,179 @@
 
         </div>
 
+
     </div>
 
-    <!-- PAUSA -->
-    <div id="pause-modal" class="modal hidden">
+
+    <!-- ============================================================
+         PAUSA
+         ============================================================ -->
+
+    <div
+        id="pause-modal"
+        class="modal hidden"
+    >
 
         <h2>
             JOGO PAUSADO
         </h2>
 
         <p>
-            Pressione <strong>[P]</strong>
+            Pressione
+            <strong>[P]</strong>
             para continuar
         </p>
 
     </div>
 
-    <!-- GAME OVER -->
-    <div id="game-over-modal" class="modal hidden">
+
+    <!-- ============================================================
+         GAME OVER
+         ============================================================ -->
+
+    <div
+        id="game-over-modal"
+        class="modal hidden"
+    >
 
         <h2>
             FIM DE JOGO!
         </h2>
 
         <p>
+
             Você sobreviveu até a Fase:
+
             <span id="final-level"></span>
+
         </p>
 
         <button onclick="restartGame()">
+
             Tentar Novamente
+
         </button>
 
     </div>
 
-    <!-- VITÓRIA -->
-    <div id="win-modal" class="modal hidden">
+
+    <!-- ============================================================
+         VITÓRIA
+         ============================================================ -->
+
+    <div
+        id="win-modal"
+        class="modal hidden"
+    >
 
         <h2>
             VITÓRIA!
         </h2>
 
         <p>
+
             Você destruiu o Chefe Zumbi
             e sobreviveu ao apocalipse!
+
         </p>
 
         <button onclick="restartGame()">
+
             Jogar Novamente
+
         </button>
 
     </div>
 
+
     <script>
 
         // ============================================================
-        // APOCALIPSE ZUMBI
+        // ELEMENTOS
         // ============================================================
 
-        // ------------------------------------------------------------
-        // ELEMENTOS
-        // ------------------------------------------------------------
-
         const container =
-            document.getElementById('game-container');
+            document.getElementById(
+                'game-container'
+            );
 
         const canvas =
-            document.getElementById('game-canvas');
+            document.getElementById(
+                'game-canvas'
+            );
 
         const background =
-            document.getElementById('game-background');
+            document.getElementById(
+                'game-background'
+            );
+
 
         const hud = {
 
             health:
-                document.getElementById('health-bar'),
+                document.getElementById(
+                    'health-bar'
+                ),
 
             weapon:
-                document.getElementById('current-weapon'),
+                document.getElementById(
+                    'current-weapon'
+                ),
 
             level:
-                document.getElementById('current-level'),
+                document.getElementById(
+                    'current-level'
+                ),
 
             score:
-                document.getElementById('current-score'),
+                document.getElementById(
+                    'current-score'
+                ),
 
             ammo:
-                document.getElementById('current-ammo')
+                document.getElementById(
+                    'current-ammo'
+                )
 
         };
 
+
         const pauseModal =
-            document.getElementById('pause-modal');
+            document.getElementById(
+                'pause-modal'
+            );
 
         const gameOverModal =
-            document.getElementById('game-over-modal');
+            document.getElementById(
+                'game-over-modal'
+            );
 
         const winModal =
-            document.getElementById('win-modal');
+            document.getElementById(
+                'win-modal'
+            );
 
 
-        // ------------------------------------------------------------
+        // ============================================================
         // ESTADO
-        // ------------------------------------------------------------
+        // ============================================================
 
         let isPaused = false;
+
         let gameOver = false;
+
         let gameWon = false;
 
         let gameScore = 0;
+
         let currentLevel = 1;
 
         let backgroundOffset = 0;
 
 
-        // ------------------------------------------------------------
+        // ============================================================
         // FASES
-        // ------------------------------------------------------------
+        // ============================================================
 
         const LEVEL_MAPS = [
 
@@ -771,16 +958,19 @@
         ];
 
 
-        // ------------------------------------------------------------
+        // ============================================================
         // ARMAS
-        // ------------------------------------------------------------
+        // ============================================================
 
         const WEAPONS = {
+
 
             Pistola: {
 
                 ammo: 12,
+
                 maxAmmo: 12,
+
                 reserveAmmo: 60,
 
                 damage: 25,
@@ -789,16 +979,21 @@
 
                 speed: 14,
 
-                classHeld: 'pistol-held',
+                classHeld:
+                    'pistol-held',
 
-                image: './fotos.png'
+                image:
+                    './fotos.png'
 
             },
+
 
             AK47: {
 
                 ammo: 30,
+
                 maxAmmo: 30,
+
                 reserveAmmo: 120,
 
                 damage: 18,
@@ -807,9 +1002,11 @@
 
                 speed: 16,
 
-                classHeld: 'ak47-held',
+                classHeld:
+                    'ak47-held',
 
-                image: './otiQd2.png'
+                image:
+                    './otiQd2.png'
 
             }
 
@@ -819,34 +1016,46 @@
         let currentWeaponName =
             'Pistola';
 
+
         let activeWeapon = {
-            ...WEAPONS[currentWeaponName]
+
+            ...WEAPONS[
+                currentWeaponName
+            ]
+
         };
 
+
         let canFire = true;
+
         let isReloading = false;
 
 
-        // ------------------------------------------------------------
+        // ============================================================
         // MOUSE
-        // ------------------------------------------------------------
+        // ============================================================
 
         let mousePos = {
+
             x: 0,
+
             y: 0
+
         };
 
 
-        // ------------------------------------------------------------
+        // ============================================================
         // JOGADOR
-        // ------------------------------------------------------------
+        // ============================================================
 
         let player = {
 
             x: 120,
+
             y: 300,
 
             width: 55,
+
             height: 80,
 
             speed: 5,
@@ -854,16 +1063,18 @@
             health: 100,
 
             element: null,
+
             weaponElement: null
 
         };
 
 
-        // ------------------------------------------------------------
+        // ============================================================
         // ENTIDADES
-        // ------------------------------------------------------------
+        // ============================================================
 
         let zombies = [];
+
         let bullets = [];
 
         let boss = null;
@@ -871,9 +1082,9 @@
         let bossProjectiles = [];
 
 
-        // ------------------------------------------------------------
+        // ============================================================
         // TECLAS
-        // ------------------------------------------------------------
+        // ============================================================
 
         const keys = {};
 
@@ -886,13 +1097,17 @@
 
             createPlayer();
 
-            loadLevel(currentLevel);
+            loadLevel(
+                currentLevel
+            );
 
             setupInputs();
 
             updateHUD();
 
-            requestAnimationFrame(gameLoop);
+            requestAnimationFrame(
+                gameLoop
+            );
 
         }
 
@@ -904,28 +1119,37 @@
         function createPlayer() {
 
             player.element =
-                document.createElement('div');
+                document.createElement(
+                    'div'
+                );
 
             player.element.className =
                 'player';
 
 
             const body =
-                document.createElement('div');
+                document.createElement(
+                    'div'
+                );
 
             body.className =
                 'player-body';
 
 
             const head =
-                document.createElement('div');
+                document.createElement(
+                    'div'
+                );
 
             head.className =
                 'player-head';
 
 
             player.weaponElement =
-                document.createElement('img');
+                document.createElement(
+                    'img'
+                );
+
 
             player.weaponElement.className =
                 'weapon';
@@ -934,9 +1158,13 @@
             updateWeaponImage();
 
 
-            player.element.appendChild(body);
+            player.element.appendChild(
+                body
+            );
 
-            player.element.appendChild(head);
+            player.element.appendChild(
+                head
+            );
 
             player.element.appendChild(
                 player.weaponElement
@@ -951,7 +1179,7 @@
 
 
         // ============================================================
-        // IMAGEM DA ARMA
+        // ATUALIZAR IMAGEM DA ARMA
         // ============================================================
 
         function updateWeaponImage() {
@@ -976,12 +1204,17 @@
 
             clearZombies();
 
+
             const map =
-                LEVEL_MAPS[level - 1];
+                LEVEL_MAPS[
+                    level - 1
+                ];
 
 
             if (!map) {
+
                 return;
+
             }
 
 
@@ -992,6 +1225,7 @@
             } else {
 
                 boss = null;
+
 
                 for (
                     let i = 0;
@@ -1014,12 +1248,14 @@
 
         function setupInputs() {
 
+
             window.addEventListener(
                 'keydown',
                 (e) => {
 
                     const key =
                         e.key.toLowerCase();
+
 
                     keys[key] = true;
 
@@ -1040,17 +1276,23 @@
 
 
                     if (key === 'r') {
+
                         reloadWeapon();
+
                     }
 
 
                     if (key === 'q') {
+
                         swapWeapon();
+
                     }
 
 
                     if (key === 'p') {
+
                         togglePause();
+
                     }
 
                 }
@@ -1087,8 +1329,12 @@
                 'mousedown',
                 (e) => {
 
-                    if (e.button === 0) {
+                    if (
+                        e.button === 0
+                    ) {
+
                         keys.click = true;
+
                     }
 
                 }
@@ -1099,8 +1345,12 @@
                 'mouseup',
                 (e) => {
 
-                    if (e.button === 0) {
+                    if (
+                        e.button === 0
+                    ) {
+
                         keys.click = false;
+
                     }
 
                 }
@@ -1115,6 +1365,7 @@
 
         function gameLoop() {
 
+
             if (
                 !isPaused &&
                 !gameOver &&
@@ -1127,9 +1378,13 @@
 
                 updateZombies();
 
+
                 if (boss) {
+
                     updateBoss();
+
                 }
+
 
                 checkCollisions();
 
@@ -1139,7 +1394,10 @@
 
             }
 
-            requestAnimationFrame(gameLoop);
+
+            requestAnimationFrame(
+                gameLoop
+            );
 
         }
 
@@ -1151,6 +1409,7 @@
         function updatePlayer() {
 
             let vx = 0;
+
             let vy = 0;
 
 
@@ -1200,6 +1459,7 @@
             ) {
 
                 vx *= 0.7071;
+
                 vy *= 0.7071;
 
             }
@@ -1208,6 +1468,7 @@
             player.x =
                 Math.max(
                     0,
+
                     Math.min(
                         container.offsetWidth -
                         player.width,
@@ -1222,6 +1483,7 @@
             player.y =
                 Math.max(
                     80,
+
                     Math.min(
                         container.offsetHeight -
                         player.height,
@@ -1240,9 +1502,9 @@
                 `${player.y}px`;
 
 
-            // --------------------------------------------------------
+            // ========================================================
             // MIRA
-            // --------------------------------------------------------
+            // ========================================================
 
             const rect =
                 container.getBoundingClientRect();
@@ -1252,6 +1514,7 @@
                 mousePos.x -
                 rect.left;
 
+
             const mouseY =
                 mousePos.y -
                 rect.top;
@@ -1260,6 +1523,7 @@
             const playerCenterX =
                 player.x +
                 player.width / 2;
+
 
             const playerCenterY =
                 player.y +
@@ -1280,9 +1544,9 @@
                 `rotate(${angle}rad)`;
 
 
-            // --------------------------------------------------------
+            // ========================================================
             // TIRO
-            // --------------------------------------------------------
+            // ========================================================
 
             if (
                 keys.click &&
@@ -1316,11 +1580,15 @@
 
             canFire = false;
 
+
             activeWeapon.ammo--;
 
 
             const bulletEl =
-                document.createElement('div');
+                document.createElement(
+                    'div'
+                );
+
 
             bulletEl.className =
                 'bullet';
@@ -1348,6 +1616,7 @@
             bullets.push({
 
                 x: startX,
+
                 y: startY,
 
                 vx:
@@ -1386,10 +1655,16 @@
 
         function updateBullets() {
 
+
+            // --------------------------------------------------------
+            // BALAS
+            // --------------------------------------------------------
+
             bullets.forEach(
                 (b, index) => {
 
                     b.x += b.vx;
+
                     b.y += b.vy;
 
 
@@ -1402,11 +1677,13 @@
 
                     if (
                         b.x < -50 ||
+
                         b.x >
                         container.offsetWidth +
                         50 ||
 
                         b.y < -50 ||
+
                         b.y >
                         container.offsetHeight +
                         50
@@ -1425,10 +1702,15 @@
             );
 
 
+            // --------------------------------------------------------
+            // PEDRAS
+            // --------------------------------------------------------
+
             bossProjectiles.forEach(
                 (p, index) => {
 
                     p.x += p.vx;
+
                     p.y += p.vy;
 
 
@@ -1441,11 +1723,13 @@
 
                     if (
                         p.x < -100 ||
+
                         p.x >
                         container.offsetWidth +
                         100 ||
 
                         p.y < -100 ||
+
                         p.y >
                         container.offsetHeight +
                         100
@@ -1473,14 +1757,18 @@
         function spawnZombie() {
 
             const zEl =
-                document.createElement('img');
+                document.createElement(
+                    'img'
+                );
 
 
             zEl.className =
                 'zombie';
 
+
             zEl.src =
                 './mini.webp';
+
 
             zEl.alt =
                 'Zumbi';
@@ -1503,6 +1791,7 @@
                 Math.random() *
                 Math.max(
                     100,
+
                     container.offsetHeight -
                     200
                 );
@@ -1511,9 +1800,11 @@
             zombies.push({
 
                 x: spawnX,
+
                 y: spawnY,
 
                 width: 55,
+
                 height: 75,
 
                 health: 50,
@@ -1543,6 +1834,7 @@
                         player.x -
                         z.x;
 
+
                     const dy =
                         player.y -
                         z.y;
@@ -1555,11 +1847,14 @@
                         );
 
 
-                    if (dist > 0) {
+                    if (
+                        dist > 0
+                    ) {
 
                         z.x +=
                             (dx / dist) *
                             z.speed;
+
 
                         z.y +=
                             (dy / dist) *
@@ -1570,6 +1865,7 @@
 
                     z.element.style.left =
                         `${z.x}px`;
+
 
                     z.element.style.top =
                         `${z.y}px`;
@@ -1595,10 +1891,11 @@
 
 
         // ============================================================
-        // LIMPAR ZUMBIS
+        // LIMPAR
         // ============================================================
 
         function clearZombies() {
+
 
             zombies.forEach(
                 (z) => {
@@ -1633,7 +1930,9 @@
         function createBoss() {
 
             const bEl =
-                document.createElement('img');
+                document.createElement(
+                    'img'
+                );
 
 
             bEl.className =
@@ -1665,9 +1964,11 @@
                     100,
 
                 width: 130,
+
                 height: 200,
 
                 health: 1500,
+
                 maxHealth: 1500,
 
                 element: bEl,
@@ -1690,7 +1991,9 @@
         function updateBoss() {
 
             if (!boss) {
+
                 return;
+
             }
 
 
@@ -1712,6 +2015,7 @@
             boss.element.style.left =
                 `${boss.x}px`;
 
+
             boss.element.style.top =
                 `${boss.y}px`;
 
@@ -1725,6 +2029,7 @@
                 boss.lastAbilityTime >
                 boss.abilityCooldown
             ) {
+
 
                 if (
                     Math.random() <
@@ -1749,7 +2054,7 @@
 
 
         // ============================================================
-        // CHEFE - INVOCAR
+        // CHEFE - INVOCAR ZUMBIS
         // ============================================================
 
         function bossAbilitySummon() {
@@ -1774,12 +2079,16 @@
         function bossAbilityThrowRock() {
 
             if (!boss) {
+
                 return;
+
             }
 
 
             const rockEl =
-                document.createElement('div');
+                document.createElement(
+                    'div'
+                );
 
 
             rockEl.className =
@@ -1813,16 +2122,20 @@
             bossProjectiles.push({
 
                 x: startX,
+
                 y: startY,
 
                 width: 45,
+
                 height: 45,
 
                 vx:
-                    Math.cos(angle) * 7,
+                    Math.cos(angle) *
+                    7,
 
                 vy:
-                    Math.sin(angle) * 7,
+                    Math.sin(angle) *
+                    7,
 
                 damage: 25,
 
@@ -1840,6 +2153,7 @@
 
         function checkCollisions() {
 
+
             // --------------------------------------------------------
             // BALAS -> ZUMBIS
             // --------------------------------------------------------
@@ -1853,8 +2167,10 @@
                 bIdx--
             ) {
 
+
                 const b =
                     bullets[bIdx];
+
 
                 let bulletRemoved =
                     false;
@@ -1869,6 +2185,7 @@
                     zIdx--
                 ) {
 
+
                     const z =
                         zombies[zIdx];
 
@@ -1880,11 +2197,13 @@
                         )
                     ) {
 
+
                         z.health -=
                             b.damage;
 
 
                         b.element.remove();
+
 
                         bullets.splice(
                             bIdx,
@@ -1900,7 +2219,9 @@
                             z.health <= 0
                         ) {
 
+
                             z.element.remove();
+
 
                             zombies.splice(
                                 zIdx,
@@ -1908,7 +2229,9 @@
                             );
 
 
-                            gameScore += 20;
+                            gameScore +=
+                                20;
+
 
                             checkLevelProgress();
 
@@ -1922,8 +2245,12 @@
                 }
 
 
-                if (bulletRemoved) {
+                if (
+                    bulletRemoved
+                ) {
+
                     continue;
+
                 }
 
 
@@ -1933,17 +2260,20 @@
 
                 if (
                     boss &&
+
                     checkPointRectCollision(
                         b,
                         boss
                     )
                 ) {
 
+
                     boss.health -=
                         b.damage;
 
 
                     b.element.remove();
+
 
                     bullets.splice(
                         bIdx,
@@ -1977,6 +2307,7 @@
                 pIdx--
             ) {
 
+
                 const p =
                     bossProjectiles[pIdx];
 
@@ -1988,12 +2319,14 @@
                     )
                 ) {
 
+
                     takeDamage(
                         p.damage
                     );
 
 
                     p.element.remove();
+
 
                     bossProjectiles.splice(
                         pIdx,
@@ -2014,16 +2347,21 @@
         function checkLevelProgress() {
 
             if (boss) {
+
                 return;
+
             }
 
 
             if (
                 zombies.length === 0 &&
+
                 currentLevel < 5
             ) {
 
+
                 currentLevel++;
+
 
                 loadLevel(
                     currentLevel
@@ -2041,7 +2379,9 @@
         function defeatBoss() {
 
             if (!boss) {
+
                 return;
+
             }
 
 
@@ -2049,6 +2389,7 @@
 
 
             boss.element.remove();
+
 
             boss = null;
 
@@ -2091,6 +2432,7 @@
                 player.health <= 0
             ) {
 
+
                 gameOver = true;
 
 
@@ -2110,7 +2452,7 @@
 
 
         // ============================================================
-        // FUNDO PARALLAX
+        // FUNDO
         // ============================================================
 
         function updateBackground() {
@@ -2158,7 +2500,9 @@
         function swapWeapon() {
 
             if (isReloading) {
+
                 return;
+
             }
 
 
@@ -2169,9 +2513,11 @@
 
 
             activeWeapon = {
+
                 ...WEAPONS[
                     currentWeaponName
                 ]
+
             };
 
 
@@ -2189,7 +2535,9 @@
         function reloadWeapon() {
 
             if (isReloading) {
+
                 return;
+
             }
 
 
@@ -2214,6 +2562,7 @@
 
             isReloading = true;
 
+
             updateHUD();
 
 
@@ -2225,6 +2574,7 @@
 
             setTimeout(
                 () => {
+
 
                     const needed =
                         activeWeapon.maxAmmo -
@@ -2248,7 +2598,9 @@
 
                     isReloading = false;
 
+
                     updateHUD();
+
 
                 },
 
@@ -2262,7 +2614,10 @@
         // COLISÃO RETÂNGULO
         // ============================================================
 
-        function checkRectCollision(r1, r2) {
+        function checkRectCollision(
+            r1,
+            r2
+        ) {
 
             return (
 
@@ -2297,7 +2652,10 @@
         // COLISÃO PONTO
         // ============================================================
 
-        function checkPointRectCollision(pt, r) {
+        function checkPointRectCollision(
+            pt,
+            r
+        ) {
 
             return (
 
@@ -2408,4 +2766,5 @@
     </script>
 
 </body>
+
 </html>
